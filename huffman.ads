@@ -6,11 +6,11 @@ with Code; use Code;
 
 package Huffman is
 
-	type Arbre is private;	
+	type Arbre is private;
 
 	type Arbre_Huffman is record
 		-- l'arbre de Huffman proprement dit
-		A : Arbre;           
+		A : Arbre;
 		-- autres infos utiles: nb total de caracteres lus, ...
 		Nb_Total_Caracteres : Natural;
 		-- A completer selon vos besoins!
@@ -21,7 +21,7 @@ package Huffman is
 	procedure Libere(H : in out Arbre_Huffman);
 
 	procedure Affiche(H : in Arbre_Huffman);
-	
+
 
 	-- Cree un arbre de Huffman a partir d'un fichier texte
 	-- Cette function lit le fichier et compte le nb d'occurences des

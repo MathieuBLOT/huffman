@@ -1,6 +1,6 @@
 
 -- Representation d'un code binaire, suite de bits 0 ou 1.
--- D'autres operations peuvent etre ajoutees si necessaire, et 
+-- D'autres operations peuvent etre ajoutees si necessaire, et
 -- toutes ne vous seront pas forcement utiles...
 
 package code is
@@ -22,7 +22,7 @@ package code is
 
 	-- Libere un code
 	procedure Libere_Code(C : in out Code_Binaire);
-	
+
 	-- Retourne le nb de bits d'un code
 	function Longueur(C : in Code_Binaire) return Natural;
 
@@ -45,7 +45,7 @@ package code is
 --
 --   Meme modele d'utilisation qu'en Java, C++, ... :
 --	It : Iterateur_Code;
---	B : Bit;    
+--	B : Bit;
 --	...
 --	It := Cree_Iterateur(Code);
 --	while Has_Next(It) loop

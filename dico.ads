@@ -1,5 +1,5 @@
 with code; use code;
-with Ada.Streams.Stream_IO; 
+with Ada.Streams.Stream_IO;
 
 -- Dictionnaire dont les cles sont des caracteres, et les valeurs
 -- un code binaire associe (par defaut)
@@ -14,21 +14,21 @@ package Dico is
 
 	-- La structure du dictionnaire lui-meme, privee
 	type Dico_Caracteres is private;
-	
+
 	Caractere_Absent : exception;
 
-	-- Cree un dictionnaire D, initialement vide	
+	-- Cree un dictionnaire D, initialement vide
 	function Cree_Dico return Dico_Caracteres;
 
 	-- Libere le dictionnaire D
 	-- garantit: en sortie toute la memoire a ete libere, et D = null.
 	procedure Libere(D : in out Dico_Caracteres);
-	
+
 	-- Affiche pour chaque caractere: son nombre d'occurences et son code
 	-- (s'il a ete genere)
 	procedure Affiche(D : in Dico_Caracteres);
-	
-	
+
+
 -- Ajouts d'informations dans le dictionnaire
 
 	-- Associe un code a un caractere
@@ -68,7 +68,7 @@ package Dico is
 	function Nb_Total_Caracteres(D : in Dico_Caracteres) return Natural;
 
 
-private 
+private
 	-- Le type Dico_Caracteres_Interne doit etre defini dans le corps
 	-- du package C(dico.adb)
 	type Dico_Caracteres_Interne;

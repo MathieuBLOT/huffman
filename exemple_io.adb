@@ -42,7 +42,7 @@ procedure exemple_IO is
 	type Octet is new Integer range 0 .. 255;
 	for Octet'Size use 8; -- permet d'utiliser Octet'Input et Octet'Output,
 	                      -- pour lire/ecrire un octet dans un flux
-	
+
 	-- Lit dans un fichier ouvert en lecture, et affiche les valeurs lues
 	procedure Lecture(Nom_Fichier : in String) is
 		Fichier : Ada.Streams.Stream_IO.File_Type;
@@ -57,10 +57,10 @@ procedure exemple_IO is
 		Put(Integer'Input(Flux));
 		Put(", ");
 		Put(Integer(Octet'Input(Flux))); -- cast necessaire Octet -> Integer
-		
+
 		-- lecture tant qu'il reste des caracteres
 		while not End_Of_File(Fichier) loop
-			C := Character'Input(Flux); 
+			C := Character'Input(Flux);
 			Put(", "); Put(C);
 		end loop;
 
@@ -92,13 +92,13 @@ procedure exemple_IO is
 		Character'Output(Flux, 'a');
 		Character'Output(Flux, 'b');
 		Character'Output(Flux, 'c');
-		
+
 		Close(Fichier);
 	end Ecriture;
 
 
 begin
 	Ecriture("exemple_io.txt");
-	Lecture("exemple_io.txt");	
+	Lecture("exemple_io.txt");
 end exemple_IO;
 
