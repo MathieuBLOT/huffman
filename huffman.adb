@@ -12,7 +12,6 @@ package body Huffman is
 		FilsD: Arbre;
 	end record;
 
-
 	procedure Free is new Ada.Unchecked_Deallocation (Noeud, Arbre);
 
 
@@ -43,6 +42,8 @@ package body Huffman is
 		end if;
 		Put("[");
 		Put(H.A.Lettre);
+		Put(", ");
+		Put(Integer'Image(H.A.Priorite));
 		Put("]");
 		if H.A.Fg /= NULL then
 			Put(" /");
