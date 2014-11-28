@@ -3,7 +3,7 @@ use Ada.Integer_Text_IO, Ada.Text_IO;
 
 package body File_Priorite is
 
-	Erreur_File_Vide, Erreur_File_Pleine: Exception;
+-- 	Erreur_File_Vide, Erreur_File_Pleine: Exception;
 
 	procedure Libere is new Ada.Unchecked_Deallocation (File_Interne, File_Prio);
 
@@ -47,7 +47,7 @@ package body File_Priorite is
 	-- retourne True si la file est pleine, False sinon
 	function Est_Pleine(F: in File_Prio) return Boolean is
 	begin
-		return F.Nombre = F.T'Size;
+		return F.Nombre = F.T'Length;
 	end Est_Pleine;
 
 	-- A NE PAS METTRE DANS L'API !

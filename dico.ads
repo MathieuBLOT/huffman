@@ -10,6 +10,8 @@ package Dico is
 	type Info_Caractere is record
 		Code : Code_Binaire;
 		-- A modifier/completer selon les besoins!
+		Occurrence: Integer;
+		-- Longueur d'un symbole ?
 	end record;
 
 	-- La structure du dictionnaire lui-meme, privee
