@@ -3,10 +3,6 @@ use Ada.Integer_Text_IO, Ada.Text_IO;
 
 package body File_Priorite is
 
--- 	Erreur_File_Vide, Erreur_File_Pleine: Exception;
-
-	procedure Libere is new Ada.Unchecked_Deallocation (File_Interne, File_Prio);
-
 	type Element_Tas is record
 		Value: Donnee;
 		Prio: Priorite;
@@ -18,6 +14,10 @@ package body File_Priorite is
 		Nombre: Integer;	-- Number of current elements in the file
 		T: Tab(1..Size);
 	end record;
+
+	procedure Libere is new Ada.Unchecked_Deallocation (File_Interne, File_Prio);
+
+
 
 	-- Cree et retourne une nouvelle file, initialement vide
 	-- et de capacite maximale Capacite
@@ -40,20 +40,20 @@ package body File_Priorite is
 	-- retourne True si la file est vide, False sinon
 	function Est_Vide(F: in File_Prio) return Boolean is
 	begin
-		return F = null;
--- 		return F.Nombre = 0;	-- Au choix...
-	end Est_Vide:
+		return F.Nombre = 0;
+	end Est_Vide;
 
 	-- retourne True si la file est pleine, False sinon
 	function Est_Pleine(F: in File_Prio) return Boolean is
 	begin
-		return F.Nombre = F.T'Length;
+-- 		return F.Nombre = F.T'Length;
+		return F.Nombre = F.T'Last;	-- Au choix...
 	end Est_Pleine;
 
 	-- A NE PAS METTRE DANS L'API !
 	-- factorisation d'un échange entre 2 éléments de la file de priorité ;
 	--   on décide s'il faut faire l'échange en amont.
-	procedure Swap2(E1, E2 : Element_Tas) is
+	procedure Swap2(E1, E2 : in out Element_Tas) is
 		TmpD: Donnee := E1.Value;
 		TmpP: Priorite := E1.Prio;
 	begin
@@ -75,13 +75,14 @@ package body File_Priorite is
 			F.T(F.Nombre).Value := D;
 			F.T(F.Nombre).Prio := P;
 
-			while Index /= 1 AND THEN F.T(Index).Prio > F.T(Index/2).Prio loop
+			while Index > F.T'First AND THEN Est_Prioritaire(F.T(Index).Prio, F.T(Index/2).Prio) loop
 				Swap2(F.T(Index), F.T(Index/2));
 				Index := Index/2;
 			end loop;
 		else
-			Put_Line("La file est pleine.");	-- En attendant
-			raise Erreur_File_Pleine;
+-- 			Put_Line("La file est pleine.");	-- En attendant
+			raise File_Prio_Pleine;
+		end if;
 	end Insere;
 
 	-- si not Est_Vide(F)
@@ -90,15 +91,18 @@ package body File_Priorite is
 	-- sinon
 	--   leve l'exception File_Vide
 	procedure Supprime(F: in File_Prio; D: out Donnee; P: out Priorite) is
-		Index: Integer := 1;	-- The algorithm begins at the root
+		Index: Integer := F.T'First;	-- The algorithm begins at the root
 	begin
 		if NOT Est_Vide(F) then
-			Swap2(F.T(F.T'First), F.T(F.Nombre));	-- A moins que F.T(F.T'Last) ne soit plus lisible ?
+			Swap2(F.T(F.T'First), F.T(F.Nombre));
+
+			D := F.T(F.Nombre).Value;
+			P := F.T(F.Nombre).Prio;
 
 			F.Nombre := F.Nombre - 1;
-			-- Until it is a leaf
-			while Index <= F.Nombre/2 AND THEN (F.T(Index).Prio < F.T(2*Index).Prio OR F.T(Index).Prio < F.T(2*Index + 1).Prio) loop
-				if F.T(Index).Prio < F.T(2*Index).Prio then
+			-- Until it is a leaf						-- Left son should cliimb					-- Check the right son belongs to the heap	-- Right son should climb
+			while Index <= F.Nombre/2 AND THEN (Est_Prioritaire(F.T(2*Index).Prio, (F.T(Index).Prio)) OR ELSE (2*Index + 1 <= F.Nombre AND THEN Est_Prioritaire(F.T(2*Index + 1).Prio, F.T(Index).Prio))) loop
+				if Est_Prioritaire(F.T(2*Index).Prio, F.T(2*Index + 1).Prio) then
 					Swap2(F.T(Index), F.T(2*Index));
 					Index := 2*Index;
 				else
@@ -107,8 +111,9 @@ package body File_Priorite is
 				end if;
 			end loop;
 		else
-			Put_Line("La file est vide.");	-- En attendant
-			raise Erreur_File_Vide;
+-- 			Put_Line("La file est vide.");	-- En attendant
+			raise File_Prio_Vide;
+		end if;
 	end Supprime;
 
 	-- si not Est_Vide(F)
@@ -123,8 +128,9 @@ package body File_Priorite is
 			D := F.T(F.T'First).Value;
 			P := F.T(F.T'First).Prio;
 		else
-			Put_Line("La file est vide.");	-- En attendant
-			raise Erreur_File_Vide;
+-- 			Put_Line("La file est vide.");	-- En attendant
+			raise File_Prio_Vide;
+		end if;
 	end Prochain;
 
 end File_Priorite;
