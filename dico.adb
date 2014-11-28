@@ -32,7 +32,7 @@ package body Dico is
 	begin
 		for I in D.T'First..D.T'Last loop
 			Put_Line();
-			Put(I & " : ");	-- Print Character
+			Put(I & " : ");	-- Print Character -> Morph into generic Put ?
 			Put(Integer'Image(D.T(I).Occurrence) & " occurrence(s)");
 			if Integer'Image(D.T(I).Occurrence > 0 then
 				Put(", de code : ");
@@ -49,6 +49,7 @@ package body Dico is
 	procedure Set_Code(C : in Character; Code : in Code_Binaire; D : in out Dico_Caracteres) is
 	begin
 		D.T(C).Code := Code;
+-- 		D.T(C).Occurrence := D.T(C).Occurrence + 1;	-- I have no idea what I'm doing...
 	end Set_Code;
 
 	-- Associe les infos associees a un caractere
@@ -63,7 +64,7 @@ package body Dico is
 	-- retourne True sur le caractere C est present dans le D
 	function Est_Present(C : Character; D : Dico_Caracteres) return Boolean is
 	begin
-		return D.T(C).Occurence > 0;
+		return D.T(C).Occurrence > 0;	-- When to update this value ?!?
 	end Est_Present;
 
 	-- Retourne le code binaire d'un caractere
@@ -80,9 +81,12 @@ package body Dico is
 	-- Retourne les infos associees a un caractere
 	--  -> leve l'exception Caractere_Absent si C n'est pas dans D
 	function Get_Infos(C : Character; D : Dico_Caracteres) return Info_Caractere is
-
 	begin
-
+		if Est_Present(C, D) then
+			return D.T(C);
+		else
+			Put_Line("Le caractère est absent.");
+			raise Caractere_Absent;
 	end Get_Infos;
 
 
@@ -98,9 +102,11 @@ package body Dico is
 	-- Retourne le nombre total de caracteres
 	--  =  somme des nombre d'occurences de tous les caracteres de D
 	function Nb_Total_Caracteres(D : in Dico_Caracteres) return Natural is
-
+		Nb: Natural := 0;
 	begin
-
+		for I in 0..D.T'Last loop
+			Nb := Nb + D.T(I).Occurrence;
+		end loop;
 	end Nb_Total_Caracteres;
 
 end Dico;
