@@ -19,15 +19,14 @@ SRC_PACKAGES = dico.ads dico.adb \
                huffman.ads huffman.adb
 
 EXE = exemple_io tp_huffman
-TESTS = test_code
-
 
 all: $(EXE)
 
-make_tests : $(TESTS)
+make_tests : test_code test_huffman
 
 exe_tests : make_tests
-	./$(TESTS)
+	./test_code
+	./test_huffman
 
 
 ################################################################################
@@ -43,6 +42,9 @@ exemple_io: exemple_io.adb
 # Tests
 
 test_code: test_code.adb clean
+	gnatmake $(CFLAGS) $@
+
+test_huffman: test_huffman.adb clean
 	gnatmake $(CFLAGS) $@
 
 ################################################################################

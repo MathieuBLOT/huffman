@@ -42,15 +42,13 @@ package Huffman is
 	function Lit_Huffman(Flux : Ada.Streams.Stream_IO.Stream_Access)
 		return Arbre_Huffman;
 
+-- Interne ?
 
 	-- Retourne un dictionnaire contenant les caracteres presents
 	-- dans l'arbre et leur code binaire (evite les parcours multiples)
 	-- de l'arbre
 	function Genere_Dictionnaire(H : in Arbre_Huffman) return Dico_Caracteres;
 
-
-
------- Parcours de l'arbre (decodage)
 
 -- Parcours a l'aide d'un iterateur sur un code, en partant du noeud A
 --  * Si un caractere a ete trouve il est retourne dans Caractere et

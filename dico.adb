@@ -3,18 +3,18 @@ use Ada.Integer_Text_IO, Ada.Text_IO;
 
 package body Dico is
 
-	type Tab is array (Character <>) of Info_Caractere;
+	type Tab is array (Character range <>) of Info_Caractere;
 
 	type Dico_Caracteres_Interne is record
 		Number: Integer;	-- Number of different characters
-		T: Tab(0..127);
+		T: Tab(Character'Val(0)..Character'Val(127));
 	end record;
 
 	procedure Free is new Ada.Unchecked_Deallocation (Dico_Caracteres_Interne, Dico_Caracteres);
 
 	-- Cree un dictionnaire D, initialement vide
 	function Cree_Dico return Dico_Caracteres is
-		D: Dico_Caracteres := new Dico_Caracteres_Interne;
+		D: constant Dico_Caracteres := new Dico_Caracteres_Interne;
 	begin
 		return D;
 	end Cree_Dico;
@@ -31,12 +31,12 @@ package body Dico is
 	procedure Affiche(D : in Dico_Caracteres) is
 	begin
 		for I in D.T'First..D.T'Last loop
-			Put_Line();
+            New_Line;
 			Put(I & " : ");	-- Print Character -> Morph into generic Put ?
 			Put(Integer'Image(D.T(I).Occurrence) & " occurrence(s)");
-			if Integer'Image(D.T(I).Occurrence > 0 then
+			if D.T(I).Occurrence > 0 then
 				Put(", de code : ");
-				Afffiche(Integer'Image(D.T(I).Code);
+				--Affiche(Integer'Image(D.T(I).Code)); -- fix
 				Put(".");
 			end if;
 		end loop;
@@ -61,7 +61,8 @@ package body Dico is
 	-- (operation plus generale, si necessaire)
 	procedure Set_Infos(C : in Character; Infos : in Info_Caractere; D : in out Dico_Caracteres) is
 	begin
-		D.T(C).all := Infos.all;	-- Eventuellement un appel à Set_Code ?
+		--D.T(C).all := Infos.all;	-- Eventuellement un appel à Set_Code ? -- fix
+        null;
 	end Set_Infos;
 
 -- Acces aux informations sur un caractere
@@ -87,6 +88,7 @@ package body Dico is
 		else
 			Put_Line("Le caractère est absent.");
 			raise Caractere_Absent;
+        end if;
 	end Get_Code;
 
 	-- Retourne les infos associees a un caractere
@@ -98,6 +100,7 @@ package body Dico is
 		else
 			Put_Line("Le caractère est absent.");
 			raise Caractere_Absent;
+        end if;
 	end Get_Infos;
 
 
@@ -107,7 +110,7 @@ package body Dico is
 	function Nb_Caracteres_Differents(D : in Dico_Caracteres) return Natural is
 
 	begin
-
+        return 0; -- fix
 	end Nb_Caracteres_Differents;
 
 	-- Retourne le nombre total de caracteres
@@ -115,9 +118,10 @@ package body Dico is
 	function Nb_Total_Caracteres(D : in Dico_Caracteres) return Natural is
 		Nb: Natural := 0;
 	begin
-		for I in 0..D.T'Last loop
+		for I in D.T'First..D.T'Last loop
 			Nb := Nb + D.T(I).Occurrence;
 		end loop;
+        return Nb;
 	end Nb_Total_Caracteres;
 
 end Dico;
