@@ -7,3 +7,5 @@ tp_huffman
 *.o
 # Ada Library Information
 *.ali
+tags
+*.swp
