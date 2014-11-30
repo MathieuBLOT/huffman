@@ -40,7 +40,7 @@ begin
     str_code := To_Unbounded_String(code2);
     Assert(str_code = "0010", "Ajoute_Avant : " & To_String(str_code) & " au lieu de 0010");
 
-    Put_Line("####################################################################");
-    Put_Line("Les tests concernant le module Code se sont tous bien passé ! ... OK");
-    Put_Line("####################################################################");
+    Put_Line("########################################################################");
+    Put_Line("# Les tests concernant le module Code se sont tous bien passé ! ... OK #");
+    Put_Line("########################################################################");
 end test_code;
