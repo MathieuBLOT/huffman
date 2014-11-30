@@ -45,11 +45,16 @@ package body Dico is
 
 -- Ajouts d'informations dans le dictionnaire
 
+	-- Nouvelle occurence d'un caractere
+	procedure New_Occurrence(D : in Dico_Caracteres; C : Character) is
+	begin
+		D.T(C).Occurrence := D.T(C).Occurrence +1;
+	end New_Occurrence;
+
 	-- Associe un code a un caractere
 	procedure Set_Code(C : in Character; Code : in Code_Binaire; D : in out Dico_Caracteres) is
 	begin
 		D.T(C).Code := Code;
--- 		D.T(C).Occurrence := D.T(C).Occurrence + 1;	-- I have no idea what I'm doing...
 	end Set_Code;
 
 	-- Associe les infos associees a un caractere
@@ -66,6 +71,12 @@ package body Dico is
 	begin
 		return D.T(C).Occurrence > 0;	-- When to update this value ?!?
 	end Est_Present;
+
+	-- Retourne le nombre d'occurence d'un caractere
+	function Get_Occurrence(D : in Dico_Caracteres; C : Character) return Integer is
+	begin
+		return D.T(C).Occurrence;
+	end Get_Occurrence;
 
 	-- Retourne le code binaire d'un caractere
 	--  -> leve l'exception Caractere_Absent si C n'est pas dans D

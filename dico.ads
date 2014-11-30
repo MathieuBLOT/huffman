@@ -33,6 +33,9 @@ package Dico is
 
 -- Ajouts d'informations dans le dictionnaire
 
+	-- Nouvelle occurence d'un caractere
+	procedure New_Occurrence(D : in Dico_Caracteres; C : Character);
+
 	-- Associe un code a un caractere
 	procedure Set_Code(C : in Character; Code : in Code_Binaire;
 	                    D : in out Dico_Caracteres);
@@ -48,6 +51,9 @@ package Dico is
 	-- retourne True sur le caractere C est present dans le D
 	function Est_Present(C : Character; D : Dico_Caracteres)
 		return Boolean;
+
+	-- Retourne le nombre d'occurence d'un caractere
+	function Get_Occurrence(D : in Dico_Caracteres; C : Character) return Integer;
 
 	-- Retourne le code binaire d'un caractere
 	--  -> leve l'exception Caractere_Absent si C n'est pas dans D
