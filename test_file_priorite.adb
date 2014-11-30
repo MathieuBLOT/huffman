@@ -1,85 +1,89 @@
 with Ada.Integer_Text_IO, Ada.Text_IO, File_Priorite;
 use Ada.Integer_Text_IO, Ada.Text_IO;
 with Ada.Unchecked_Deallocation;
+with Ada.Assertions;  use Ada.Assertions;
 
 procedure Test_File_Priorite is
-	package Priority_Queue is new File_Priorite(
-		Character,
-		Integer,
-		">");
+    package Priority_Queue is new File_Priorite(
+        Character,
+        Integer,
+        ">");
 
-	use Priority_Queue;
+    use Priority_Queue;
 
-	L: Priority_Queue.File_Prio := Cree_File(10);
-	Di: Integer := Character'Pos('A');
-	Dc: Character;
-	P: Integer := 1;
+    L: Priority_Queue.File_Prio := Cree_File(10);
+    Di: Integer := Character'Pos('A');
+    Dc: Character;
+    P: Integer := 1;
 
 begin
-	while NOT Est_Pleine(L) loop
-		Insere(L, Character'Val(Di), P);
-		Di := Di + 1;
-		P := P + 1;
-	end loop;
+    New_Line;
+
+    while NOT Est_Pleine(L) loop
+        Insere(L, Character'Val(Di), P);
+        Di := Di + 1;
+        P := P + 1;
+    end loop;
 
 --------------------------------------------------------------------------------
 
-	Put_Line("****************************************");
-	Put_Line("Test de la procedure Prochain");
-	Prochain(L, Dc, P);
-	Put_Line("Le premier élément de la file (prochain à sortir) est : " & Dc & ", " & Integer'Image(P));
-	-- Doit donner J, 10
-	Put_Line("(On devrait obtenir J, 10)");
-	Put_Line("****************************************");
+    Prochain(L, Dc, P);
+    Assert(Dc = 'J' and then P = 10,
+            "Test de la procedure Prochain : Le premier élément de la file " &
+            "(prochain à sortir) est : " & Dc & ", " & Integer'Image(P) &
+            " au lieu de J, 10");
 
 --------------------------------------------------------------------------------
 
-	Put_Line("****************************************");
-	Put_Line("On teste si l'on peut ajouter une autre valeur :");
+    
 
-	begin
-		Insere(L, 'Z', 100);
-	exception
-		when File_Prio_Pleine
-		=> Put_Line("L'exception 'File_Prio_Pleine' marche !");
-	end;
-	Put_Line("****************************************");
-
---------------------------------------------------------------------------------
-
-	Put_Line("****************************************");
-	Put_Line("Voici la liste, triée par ordre de priorité :");
-	while NOT Est_Vide(L) loop
-		Supprime(L, Dc, P);
-		Put_Line("L'élément sorti de la file est : " & Dc & ", " & Integer'Image(P));
-	end loop;
-	Put_Line("****************************************");
+    begin
+        Insere(L, 'Z', 100);
+        Assert(false, "On teste si l'on peut ajouter une autre valeur, " &
+                "et l'exception 'File_Prio_Pleine' ne marche pas !");
+    exception
+        when File_Prio_Pleine
+        => null; -- L'exception 'File_Prio_Pleine' marche !
+        when others
+        => Assert(false, "On teste si l'on peut ajouter une autre valeur, " &
+                "et l'exception 'File_Prio_Pleine' ne marche pas !");
+    end;
 
 --------------------------------------------------------------------------------
 
-	Put_Line("****************************************");
-	Put_Line("Peut-on encore supprimer ?");
-	begin
-		Supprime(L, Dc, P);
-		Put_Line("Y'a rien a sortir normalement...: " & Dc & ", " & Integer'Image(P));
-	exception
-		when File_Prio_Vide
-		=> Put_Line("L'exception 'File_Prio_Vide' marche !");
-	end;
-	Put_Line("****************************************");
+    Put_Line("****************************************");
+    Put_Line("Voici la liste, triée par ordre de priorité :");
+    while NOT Est_Vide(L) loop
+        Supprime(L, Dc, P);
+        Put_Line("L'élément sorti de la file est : " & Dc & ", " & Integer'Image(P));
+    end loop;
+    Put_Line("****************************************");
+
+--------------------------------------------------------------------------------
+
+    begin
+        Supprime(L, Dc, P);
+        Assert(false, "L'exception 'File_Prio_Vide' ne marche pas. " &
+                "Il n'y a rien a sortir normalement...: " & Dc & ", " & Integer'Image(P));
+    exception
+        when File_Prio_Vide
+        => null; -- L'exception 'File_Prio_Vide' marche !
+    end;
 
 --- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	Put_Line("****************************************");
-	Put_Line("Y a-t-il un prochain ?");
-	begin
-		Prochain(L, Dc, P);
-		Put_Line("Y'a pas de prochain normalement...: " & Dc & ", " & Integer'Image(P));
-	exception
-		when File_Prio_Vide
-		=> Put_Line("L'exception 'File_Prio_Vide' marche !");
-	end;
-	Put_Line("****************************************");
+    begin
+        Prochain(L, Dc, P);
+        Assert(false, "Il n'y a pas de prochain normalement ou l'exception " &
+                "File_Prio_Vide ne marche pas" & Dc & ", " & Integer'Image(P));
+    exception
+        when File_Prio_Vide
+        => null; -- L'exception 'File_Prio_Vide' marche !"
+    end;
 
-	Libere_File(L);
+    Libere_File(L);
+
+    Put_Line("###########################################################################");
+    Put_Line("# Les tests concernant les File_Priorite se sont tous bien passé ! ... OK #");
+    Put_Line("###########################################################################");
 end;
