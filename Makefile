@@ -20,6 +20,8 @@ SRC_PACKAGES = dico.ads dico.adb \
 
 EXE = exemple_io tp_huffman
 TESTS = test_code
+# 	+ test_file_priorite (Je ne sais pas encore très bien me servir d'un Makefile, donc
+# 		je pense  que ça peut faire foirer exe_tests de rajouter juste comme ça...
 
 
 all: $(EXE)
