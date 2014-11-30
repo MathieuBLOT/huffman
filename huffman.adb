@@ -1,7 +1,14 @@
 with Ada.Integer_Text_IO, Ada.Text_IO, file_priorite, Ada.Unchecked_Deallocation;
 use Ada.Integer_Text_IO, Ada.Text_IO;
 
+with Ada.Streams.Stream_IO; use Ada.Streams.Stream_IO;
+
+
 package body Huffman is
+
+	type Octet is new Integer range 0 .. 255;
+	for Octet'Size use 8; -- permet d'utiliser Octet'Input et Octet'Output,
+	                      -- pour lire/ecrire un octet dans un flux
 
 	package Priorite is new file_priorite(Character, Integer, ">");
 
@@ -66,18 +73,56 @@ package body Huffman is
 	-- differents caracteres presents, puis genere l'arbre correspondant
 	-- et le retourne.
 	function Cree_Huffman(Nom_Fichier : in String) return Arbre_Huffman is
-
+		Fichier : Ada.Streams.Stream_IO.File_Type;
+		Flux : Ada.Streams.Stream_IO.Stream_Access;
+		C : Character;
 	begin
+		Open(Fichier, In_File, Nom_Fichier);
+		Flux := Stream(Fichier);
 
+		Put("~Lecture en cours~");
+
+		Put(Integer'Input(Flux));
+		Put(", ");
+		Put(Integer(Octet'Input(Flux))); -- cast necessaire Octet -> Integer
+
+		-- lecture tant qu'il reste des caracteres
+		while not End_Of_File(Fichier) loop
+			C := Character'Input(Flux);
+			Put(", "); Put(C);
+		end loop;
+
+		Close(Fichier);
 	end Cree_Huffman;
 
 	-- Stocke un arbre dans un flux ouvert en ecriture
 	-- Le format de stockage est celui decrit dans le sujet
 	-- Retourne le nb d'octets ecrits dans le flux (pour les stats)
 	function Ecrit_Huffman(H : in Arbre_Huffman; Flux : Ada.Streams.Stream_IO.Stream_Access) return Positive is
-
+		Fichier : Ada.Streams.Stream_IO.File_Type;
+		Flux : Ada.Streams.Stream_IO.Stream_Access;
+		NbOctets: Positive := 0;
 	begin
+		Create(Fichier, Out_File, Nom_Fichier);
+		Flux := Stream(Fichier);
 
+		Put("~Ecriture en cours~");
+		Put(I1); Put(", ");
+		Put(Integer(O)); Put(", ");
+		Put('a'); Put(", ");
+		Put('b'); Put(", ");
+		Put('c'); Put(", ");
+		New_Line;
+
+		Integer'Output(Flux, I1);
+		Octet'Output(Flux, O);
+		Character'Output(Flux, 'a');
+		Character'Output(Flux, 'b');
+		Character'Output(Flux, 'c');
+
+		Close(Fichier);
+
+		return NbOctets;
 	end Ecrit_Huffman;
 
 	-- Lit un arbre stocke dans un flux ouvert en lecture
