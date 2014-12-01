@@ -1,4 +1,5 @@
 with Ada.Integer_Text_IO, Ada.Text_IO, Ada.Unchecked_Deallocation;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 use Ada.Integer_Text_IO, Ada.Text_IO;
 
 package body Dico is
@@ -7,7 +8,7 @@ package body Dico is
 
 	type Dico_Caracteres_Interne is record
 		Number: Integer;	-- Number of different characters
-		T: Tab(Character'Val(0)..Character'Val(127));
+		T: Tab(Character'Val(0)..Character'Val(255));
 	end record;
 
 	procedure Free is new Ada.Unchecked_Deallocation (Dico_Caracteres_Interne, Dico_Caracteres);
@@ -36,7 +37,7 @@ package body Dico is
 			Put(Integer'Image(D.T(I).Occurrence) & " occurrence(s)");
 			if D.T(I).Occurrence > 0 then
 				Put(", de code : ");
-				--Affiche(Integer'Image(D.T(I).Code)); -- fix
+				Put(To_String(To_Unbounded_String(D.T(I).Code)));
 				Put(".");
 			end if;
 		end loop;
@@ -61,8 +62,7 @@ package body Dico is
 	-- (operation plus generale, si necessaire)
 	procedure Set_Infos(C : in Character; Infos : in Info_Caractere; D : in out Dico_Caracteres) is
 	begin
-		--D.T(C).all := Infos.all;	-- Eventuellement un appel à Set_Code ? -- fix
-        null;
+        Set_Code(C, D.T(C).Code, D);
 	end Set_Infos;
 
 -- Acces aux informations sur un caractere

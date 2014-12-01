@@ -1,5 +1,5 @@
 with Ada.Integer_Text_IO, Ada.Text_IO, Ada.Unchecked_Deallocation;
-use Ada.Integer_Text_IO, Ada.Text_IO;
+--use Ada.Integer_Text_IO, Ada.Text_IO;
 
 package body File_Priorite is
 

@@ -1,5 +1,6 @@
 with Ada.Integer_Text_IO, Ada.Text_IO, file_priorite, Ada.Unchecked_Deallocation;
 use Ada.Integer_Text_IO, Ada.Text_IO;
+with Ada.Assertions;  use Ada.Assertions;
 
 package body Huffman is
 
@@ -34,6 +35,7 @@ package body Huffman is
 	begin
 		return A = null;
 	end Est_Vide;
+
 
 
 	procedure Libere(H : in out Arbre_Huffman) is
@@ -73,9 +75,9 @@ package body Huffman is
                 Affiche(A.FilsD);
                 Put(")");
             end if;
-            return;
         end Affiche;
 	begin
+        Put_Line("~ Affichage de l'abre de Huffman ~");
         Affiche(H.A);
 	end Affiche;
 
@@ -107,7 +109,7 @@ package body Huffman is
 		Fichier : Ada.Streams.Stream_IO.File_Type;
 		Flux : Ada.Streams.Stream_IO.Stream_Access;
 
-		O: Octet;
+		C: Character;
 		F: File_Prio := Cree_File(128);
 		D: Dico_Caracteres := Cree_Dico;	-- Replace with simple Array ?
 		Code: Code_Binaire := Cree_Code;
@@ -122,29 +124,26 @@ package body Huffman is
 		Flux := Stream(Fichier);
 
 		Put_Line("~Lecture en cours~");
+		Assert( not End_Of_File(Fichier), "Le fichier " & nom_fichier & " semble vide");
 		-- lecture tant qu'il reste des caracteres
 		while not End_Of_File(Fichier) loop
-			O := Octet'Input(Flux);
--- 			Put(", "); Put(O);	-- Could be useful for DeBug purposes...
-			New_Occurrence(D, Character'Val(Integer(O)));
+			C := Character'Val(Octet'Input(Flux));
+			Put(C);
+			New_Occurrence(D, C);
 		end loop;
+		New_Line;
 
 		Close(Fichier);
 
 		-- Might as well process data after stream closed...
 		Put_Line("~Initialisation de la file de priorite~");
 		for C in Character'First..Character'Last loop
-		-- DON'T FORGET !! (After ?)
--- 			;	-- Generate Code
--- 			Set_Code(C, Code, D);	-- Associate Character with (Binary) Code
---
---
--- 			-- to fix
-   			null;
---
+			-- Generate Code
+			Set_Code(C, Code, D);	-- Associate Character with (Binary) Code
 			--Insere(F, Insere_Noeud(C, Get_Occurrence(D, C), H.A), Get_Occurrence(D, C));	-- Insert Character in Priority_Queue
-
 		end loop;
+		Affiche(D);
+		New_Line;
 
 		Put_Line("~Initialistation de l'arbre de Huffman~");
 		while NOT Est_Vide(F) loop

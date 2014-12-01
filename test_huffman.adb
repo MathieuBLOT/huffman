@@ -1,8 +1,7 @@
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Assertions;  use Ada.Assertions;
 with Huffman; use Huffman;
-with Ada.Streams; use Ada.Streams;
-with Ada.Streams.Stream_IO;
+with Ada.Streams.Stream_IO; use Ada.Streams.Stream_IO;
 
 procedure Test_huffman is
 --    type Stat is record
@@ -76,18 +75,22 @@ procedure Test_huffman is
 ----------
 
     huff : Arbre_Huffman;
-    stream : Ada.Streams.Stream_IO.Stream_Access;
+    flux : Ada.Streams.Stream_IO.Stream_Access;
 
+    nom_fichier : String := "Tests/mini.txt";
 begin
     New_line;
 
+
     -- compression
-    -- huff := Cree_Huffman("Tests/mini.txt");
-    -- Affiche(huff);
+    huff := Cree_Huffman(nom_fichier);
+    Affiche(huff);
+
     -- Assert(Ecrit_Huffman(huff, stream) /= 0, "Erreur lors de l'écriture de l'arbre d'Huffman");
 
     -- decompression
-    -- Assert(Lit_hiffman(stream) = huff), "L'arbre obtenue après décompression ne correspond pas à l'arbre avant compression");
+    -- Assert(Lit_hiffman(flux) = huff), "L'arbre obtenue après décompression ne correspond pas à l'arbre avant compression");
+
 ----------
 --    dico := (
 --             (letter => 'a', number => 4),
@@ -108,7 +111,6 @@ begin
 --    code := GenerateCode(dico);
 --
 --    Assert(Same(code, solution), "Erreur lors de la generation du code binaire");
-
 
     Put_Line("###########################################################################");
     Put_Line("# Les tests concernant le module Huffman se sont tous bien passé ! ... OK #");
