@@ -1,6 +1,10 @@
 *~
+b~*
 *.kate-swp
 exemple_io*
+
+test_code
+test_file_priorite
 tp_huffman
 
 # Object file
