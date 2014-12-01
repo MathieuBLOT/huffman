@@ -66,7 +66,8 @@ package body Code is
     function To_String(B : in Bit) return String is
         img : constant String := Bit'Image(B);
     begin
-        return img(img'last..img'last);
+        return img(img'last..img'last); -- Bit'Image = " 0" ou " 1", donc on
+        -- enlève l'espace.
     end To_String;
 
     function To_Unbounded_String(C : in Code_Binaire) return Unbounded_string is
