@@ -4,7 +4,7 @@ with Ada.Assertions;  use Ada.Assertions;
 with code; use code;
 
 procedure test_code is
-    code, code1, code2 : Code_Binaire;
+    code, code1, code2, code3 : Code_Binaire;
     str_code : Unbounded_string;
     i : Integer;
     it : Iterateur_Code;
@@ -39,6 +39,15 @@ begin
     Ajoute_Avant(ZERO, code2);
     str_code := To_Unbounded_String(code2);
     Assert(str_code = "0010", "Ajoute_Avant : " & To_String(str_code) & " au lieu de 0010");
+
+    code3 := Cree_Code;
+    Ajoute_Apres(UN, code3);
+    Ajoute_Apres(UN, code3);
+    Ajoute_Apres(UN, code3);
+    Ajoute_Apres(code2, code3);
+    str_code := To_Unbounded_String(code3);
+    Assert(str_code = "1110010", "Ajoute_apres(Code, Code) : " & To_String(str_code)
+            & " au lieu de 1110010");
 
     Put_Line("########################################################################");
     Put_Line("# Les tests concernant le module Code se sont tous bien passé ! ... OK #");
