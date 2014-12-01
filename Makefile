@@ -1,5 +1,6 @@
 
-CFLAGS = -g -gnata -gnato13 -gnatf -gnatwa -gnatVa -gnat2012 -Wall -E -gnateE # -gnatwe -gnaty3abcdefhiklmnoOprstux -O2
+CFLAGS = -g -gnata -gnatf -gnatwa -gnatVa -gnat2012 -Wall -E -gnateE # -gnatwe -gnaty3abcdefhiklmnoOprstux -O2
+	# -gnato13
              #-fstack-check                 --  Generate stack checking code (part of Ada)
              #-gnata                        --  Enable assertions            (part of Ada)
              #-gnato13                      --  Overflow checking            (part of Ada)
