@@ -86,6 +86,11 @@ begin
     huff := Cree_Huffman(nom_fichier);
     Affiche(huff);
 
+    New_line;
+    New_line;
+    New_line;
+    Huffman_procedure_test;
+
     -- Assert(Ecrit_Huffman(huff, stream) /= 0, "Erreur lors de l'écriture de l'arbre d'Huffman");
 
     -- decompression

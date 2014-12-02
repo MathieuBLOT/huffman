@@ -169,7 +169,6 @@ package body Huffman is
 			return str;
 		end Feuille;
 	begin
-        Put_Line("~ Affichage de l'abre de Huffman ~");
 		return Child(A, 0);
 	end To_Unbounded_String;
 
@@ -193,8 +192,9 @@ package body Huffman is
 		Assert( not End_Of_File(Fichier), "Le fichier " & nom_fichier & " semble vide");
 
 		-- lecture tant qu'il reste des caracteres
-		while not End_Of_File(Fichier) loop
+		loop
 			C := Character'Val(Octet'Input(Flux));
+			exit when End_Of_File(Fichier);
 
 			-- Pour le debug, à supprimer ensuite
 			Put(C);
@@ -202,6 +202,10 @@ package body Huffman is
 			New_Occurrence(D, C);
 			N := N + 1;
 		end loop;
+
+		-- Pour le debug, à supprimer ensuite
+		New_Line;
+
 		Close(Fichier);
 	end Lire_Fichier;
 
@@ -299,6 +303,7 @@ package body Huffman is
 		Put_Line("~Génération de l'arbre de Huffman~");
 		A := Genere_Arbre(queue_arbre);
 		new_Line;
+        Put_Line("~ Affichage de l'abre de Huffman ~");
 		Put_Line(To_String(To_Unbounded_String(A, D)));
 		new_Line;
 
@@ -309,6 +314,50 @@ package body Huffman is
 		H := new Internal_Huffman'(dico => D, nb_char => N);
         return H;
 	end Cree_Huffman;
+
+	procedure Huffman_procedure_test is
+		D: Dico_Caracteres;
+		N: Integer;
+
+		H: Arbre_Huffman;
+
+		A : Arbre;
+		queue_arbre : File_Prio := Cree_File(256); -- Il faudrait utiliser un attribut tel que dico'last mais je ne sais pas comment l'utiliser
+
+		nom_fichier : String := "Tests/3a_4b_5c_6d.txt";
+
+		arbre_solution : String := 
+				"┬─0─┬─0─                                a:  ( 3 occurrences)" & ASCII.LF &
+				"│   └─1─                                b:  ( 4 occurrences)" & ASCII.LF &
+				"└─1─┬─0─                                c:  ( 5 occurrences)" & ASCII.LF &
+				"│   └─1─                                d:  ( 6 occurrences)" & ASCII.LF ;
+	begin
+		Put_Line("~Lecture du fichier " & Nom_Fichier & " ~");
+		Lire_Fichier(Nom_Fichier, D, N);
+
+		Assert(Get_Occurrence(D, 'a') = 3, "Le nombre de a lu ne correspond pas");
+		Assert(Get_Occurrence(D, 'b') = 4, "Le nombre de b lu ne correspond pas");
+		Assert(Get_Occurrence(D, 'c') = 5, "Le nombre de c lu ne correspond pas");
+		Assert(Get_Occurrence(D, 'd') = 6, "Le nombre de d lu ne correspond pas");
+
+		Put_Line("~Initialisation de la file de priorite~");
+		Initialise_Queue_Arbre(queue_arbre, D);
+
+		Put_Line("~Génération de l'arbre de Huffman~");
+		A := Genere_Arbre(queue_arbre);
+		if To_String(To_Unbounded_String(A,D)) /= arbre_solution then
+			Put(
+					"L'arbre généré n'est pas le bon : " & ASCII.LF & ASCII.LF &
+					To_String(To_Unbounded_String(A, D)) & ASCII.LF & ASCII.LF &
+					"Au lieu de : " & ASCII.LF & ASCII.LF &
+					arbre_solution);
+			--Assert(false); à décommenter pour pouvoir utiliser le test
+		end if;
+
+		--Put_Line("~Initialistation des codes de compressions~");
+		--Genere_Code(A, D);
+		--Affiche(D);
+	end Huffman_procedure_test;
 
 	-- Stocke un arbre dans un flux ouvert en ecriture
 	-- Le format de stockage est celui decrit dans le sujet

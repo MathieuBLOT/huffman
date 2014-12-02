@@ -34,6 +34,7 @@ package Huffman is
 	-- Retourne le nb d'octets ecrits dans le flux (pour les stats)
 	function Ecrit_Huffman(H : in Arbre_Huffman; stream : Stream_Access) return Natural;
 
+	procedure Huffman_procedure_test;
 private
 
 	type Noeud;
