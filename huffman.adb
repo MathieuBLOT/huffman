@@ -215,7 +215,7 @@ package body Huffman is
 	begin
 		-- On regroupe les deux noeuds de plus faible valeure et ainsi de suite
 		-- jusqu'à ce qu'on n'ai plus qu'un arbre unique
-		loop 
+		loop
 			Supprime(queue_arbre, fg, prio_g);
 			exit when Est_Vide(queue_arbre);
 			Supprime(queue_arbre, fd, prio_d);
@@ -293,7 +293,7 @@ package body Huffman is
 
 		A : Arbre;
 		queue_arbre : File_Prio := Cree_File(256); -- Il faudrait utiliser un attribut tel que dico'last mais je ne sais pas comment l'utiliser
-		
+
 	begin
 		Put_Line("~Lecture du fichier " & Nom_Fichier & " ~");
 		Lire_Fichier(Nom_Fichier, D, N);
@@ -327,7 +327,7 @@ package body Huffman is
 
 		nom_fichier : String := "Tests/3a_4b_5c_6d.txt";
 
-		arbre_solution : String := 
+		arbre_solution : String :=
 				"┬─0─┬─0─                                a:  ( 3 occurrences)" & ASCII.LF &
 				"│   └─1─                                b:  ( 4 occurrences)" & ASCII.LF &
 				"└─1─┬─0─                                c:  ( 5 occurrences)" & ASCII.LF &

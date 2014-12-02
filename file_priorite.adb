@@ -110,7 +110,7 @@ package body File_Priorite is
         D := F.T(F.T'First).Value;
         P := F.T(F.T'First).Prio;
 
-        Swap2(F.T(F.T'First), F.T(F.Nombre));
+        Swap2(F.T(F.T'First), F.T(F.T'First + F.Nombre - 1));
 
         F.Nombre := F.Nombre - 1;
         -- Until it is a leaf					    -- Left son should cliimb
@@ -122,7 +122,7 @@ package body File_Priorite is
 
                 exit when not (fg_est_prio or fd_est_prio);
 
-				if Est_Prioritaire(F.T(2*Index).Prio, F.T(2*Index + 1).Prio) then
+				if (not fd_existe) or Est_Prioritaire(F.T(2*Index).Prio, F.T(2*Index + 1).Prio) then
 					Swap2(F.T(Index), F.T(2*Index));
 					Index := 2*Index;
 				else
