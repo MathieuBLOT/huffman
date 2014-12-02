@@ -17,22 +17,34 @@ procedure Test_File_Priorite is
 begin
     New_Line;
 
-    -- On ajoute des lettre de 'a' à 'j' de prioritée 1..10
-    while NOT Priority_Queue.Est_Pleine(L) loop
-        Priority_Queue.Insere(L, Character'Val(Di), P);
-        Di := Di + 1;
-        P := P + 1;
-    end loop;
+--     while NOT Est_Pleine(L) loop
+--         Insere(L, Character'Val(Di), P);
+--         Di := Di + 1;
+--         P := P + 1;
+--     end loop;
+
+
+	Priority_Queue.Insere(L, 'A', 1);
+	Priority_Queue.Insere(L, 'B', 30);
+	Priority_Queue.Insere(L, 'C', 5);
+	Priority_Queue.Insere(L, 'D', 77);
+	Priority_Queue.Insere(L, 'E', 6);
+	Priority_Queue.Insere(L, 'F', 4);
+	Priority_Queue.Insere(L, 'G', 66);
+	Priority_Queue.Insere(L, 'H', 125);
+	Priority_Queue.Insere(L, 'I', 3);
+	Priority_Queue.Insere(L, 'J', 99);
 
 --------------------------------------------------------------------------------
 
     Priority_Queue.Prochain(L, Dc, P);
-    Assert(Dc = 'J' and then P = 10,
+    Assert(Dc = 'H' and then P = 125,
             "Test de la procedure Prochain : Le premier élément de la file " &
             "(prochain à sortir) est : " & Dc & ", " & Integer'Image(P) &
-            " au lieu de J, 10");
+            " au lieu de H, 125");
 
 --------------------------------------------------------------------------------
+
 
     begin
         Priority_Queue.Insere(L, 'Z', 100);

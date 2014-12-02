@@ -110,7 +110,7 @@ package body File_Priorite is
             D := F.T(F.T'First).Value;
             P := F.T(F.T'First).Prio;
 
-            Swap2(F.T(F.T'First), F.T(F.Nombre));
+            Swap2(F.T(F.T'First), F.T(F.T'First + F.Nombre - 1));
 
             F.Nombre := F.Nombre - 1;
             -- Until it is a leaf					    -- Left son should cliimb
@@ -122,6 +122,7 @@ package body File_Priorite is
                 fg_est_prio := fg_existe and then Est_Prioritaire(F.T(2*Index).Prio, F.T(Index).Prio);
                 fd_est_prio := fd_existe and then Est_Prioritaire(F.T(2*Index + 1).Prio, F.T(Index).Prio);
 
+                -- Si on arrive là, IL Y A un prioritaire ; seulement, l'un des fils n'existe peut-être pas...
                 if fg_existe then
                     if fd_existe then
                         if Est_Prioritaire(F.T(2*Index).Prio, F.T(2*Index + 1).Prio) then
