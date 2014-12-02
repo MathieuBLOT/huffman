@@ -325,13 +325,14 @@ package body Huffman is
 		A : Arbre;
 		queue_arbre : File_Prio := Cree_File(256); -- Il faudrait utiliser un attribut tel que dico'last mais je ne sais pas comment l'utiliser
 
-		nom_fichier : String := "Tests/3a_4b_5c_6d.txt";
+		nom_fichier : String := "Tests/3a_4b_5c_6d_7e.txt";
 
 		arbre_solution : String := 
-				"┬─0─┬─0─                                a:  ( 3 occurrences)" & ASCII.LF &
-				"│   └─1─                                b:  ( 4 occurrences)" & ASCII.LF &
-				"└─1─┬─0─                                c:  ( 5 occurrences)" & ASCII.LF &
-				"│   └─1─                                d:  ( 6 occurrences)" & ASCII.LF ;
+			"┬─0─┬─0─┬─0─                            a:  ( 3 occurrences)" & ASCII.LF &
+			"│   │   └─1─                            b:  ( 4 occurrences)" & ASCII.LF &
+			"│   └─0─                                e:  ( 7 occurrences)" & ASCII.LF &
+			"└─1─┬─0─                                c:  ( 5 occurrences)" & ASCII.LF &
+			"│   └─1─                                d:  ( 6 occurrences)" & ASCII.LF ;
 	begin
 		Put_Line("~Lecture du fichier " & Nom_Fichier & " ~");
 		Lire_Fichier(Nom_Fichier, D, N);
@@ -340,6 +341,7 @@ package body Huffman is
 		Assert(Get_Occurrence(D, 'b') = 4, "Le nombre de b lu ne correspond pas");
 		Assert(Get_Occurrence(D, 'c') = 5, "Le nombre de c lu ne correspond pas");
 		Assert(Get_Occurrence(D, 'd') = 6, "Le nombre de d lu ne correspond pas");
+		Assert(Get_Occurrence(D, 'e') = 7, "Le nombre de e lu ne correspond pas");
 
 		Put_Line("~Initialisation de la file de priorite~");
 		Initialise_Queue_Arbre(queue_arbre, D);

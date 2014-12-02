@@ -104,31 +104,42 @@ package body File_Priorite is
 	--   leve l'exception File_Vide
 	procedure Supprime(F: in File_Prio; D: out Donnee; P: out Priorite) is
 		Index: Integer := F.T'First;	-- The algorithm begins at the root
-        fg_est_prio, fd_est_prio, fd_existe: Boolean;
+        fg_est_prio, fd_est_prio, fg_existe, fd_existe: Boolean;
         begin
         if NOT Est_Vide(F) then
-        D := F.T(F.T'First).Value;
-        P := F.T(F.T'First).Prio;
+            D := F.T(F.T'First).Value;
+            P := F.T(F.T'First).Prio;
 
-        Swap2(F.T(F.T'First), F.T(F.Nombre));
+            Swap2(F.T(F.T'First), F.T(F.Nombre));
 
-        F.Nombre := F.Nombre - 1;
-        -- Until it is a leaf					    -- Left son should cliimb
-        -- Check the right son belongs to the heap	-- Right son should climb
-        while Index <= F.Nombre/2 loop
-                fg_est_prio := Est_Prioritaire(F.T(2*Index).Prio, F.T(Index).Prio);
-                fd_existe := 2*Index + 1 <= F.T'First + F.Nombre - 1;
+            F.Nombre := F.Nombre - 1;
+            -- Until it is a leaf					    -- Left son should cliimb
+            -- Check the right son belongs to the heap	-- Right son should climb
+            loop
+                fg_existe := 2*Index     < F.T'First + F.Nombre;
+                fd_existe := 2*Index + 1 < F.T'First + F.Nombre;
+
+                fg_est_prio := fg_existe and then Est_Prioritaire(F.T(2*Index).Prio, F.T(Index).Prio);
                 fd_est_prio := fd_existe and then Est_Prioritaire(F.T(2*Index + 1).Prio, F.T(Index).Prio);
 
-                exit when not (fg_est_prio or fd_est_prio);
-
-				if Est_Prioritaire(F.T(2*Index).Prio, F.T(2*Index + 1).Prio) then
-					Swap2(F.T(Index), F.T(2*Index));
-					Index := 2*Index;
-				else
-					Swap2(F.T(Index), F.T(2*Index + 1));
-					Index := 2*Index + 1;
-				end if;
+                if fg_existe then
+                    if fd_existe then
+                        if Est_Prioritaire(F.T(2*Index).Prio, F.T(2*Index + 1).Prio) then
+                            Swap2(F.T(Index), F.T(2*Index));
+                            Index := 2*Index;
+                        else
+                            Swap2(F.T(Index), F.T(2*Index + 1));
+                            Index := 2*Index + 1;
+                        end if;
+                    else
+                        exit;
+                    end if;
+                else
+                    if fg_est_prio then
+                        Swap2(F.T(Index), F.T(2*Index));
+                    end if;
+                    exit;
+                end if;
 			end loop;
 		else
 			raise File_Prio_Vide;
