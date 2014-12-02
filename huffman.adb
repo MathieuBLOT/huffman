@@ -192,14 +192,22 @@ package body Huffman is
 	function Ecrit_Huffman(H : in Arbre_Huffman; Flux : Ada.Streams.Stream_IO.Stream_Access) return Positive is
 		Fichier : Ada.Streams.Stream_IO.File_Type;
 		stream : Ada.Streams.Stream_IO.Stream_Access;
-		NbOctets: constant Positive := 0;
+		NbOctets: Positive := 0;
 		O: Octet := 0;
         Nom_Fichier : String := ""; -- fix
 	begin
 		Create(Fichier, Out_File, Nom_Fichier);
 		--stream := Stream(Fichier);
+		Put_Line("~Stockage de l'arbre en cours~");
 
-		Put("~Ecriture en cours~");
+		for C in 0..128 loop
+-- 			Check number of Occurrences ?
+			Character'Output(stream, Character'Val(C));
+-- 			Longueur du code binaire correspondant au caractère -> Dico ?
+			NbOctets := NbOctets + 1;
+		end loop;
+
+		Put_Line("~Ecriture en cours~");
 
 		--Integer'Output(stream, I1);
 		Octet'Output(stream, O);
