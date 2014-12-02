@@ -23,10 +23,11 @@ package body Huffman is
 		FilsD: Arbre;
 	end record;
 
--- 	type Internal_Huffman is record
--- 		arb : Arbre;
--- 		nb_char : Integer;
--- 	end record;
+   	type Internal_Huffman is record
+   		arb : Arbre;
+		dico : Dico_Caracteres;
+   		nb_char : Integer;
+   	end record;
 
 	procedure Libere is new Ada.Unchecked_Deallocation (Noeud, Arbre);
 	function Est_une_Feuille(A : in Arbre) return Boolean;
@@ -174,7 +175,7 @@ package body Huffman is
 
 	procedure Affiche(H : in Arbre_Huffman) is
 	begin
-		--Put_Line(To_Unbounded_String(A));
+		--Put_Line(To_String(To_Unbounded_String(H.arb, H.dico)));
 		null;
 	end Affiche;
 
@@ -196,15 +197,9 @@ package body Huffman is
 			C := Character'Val(Octet'Input(Flux));
 			exit when End_Of_File(Fichier);
 
-			-- Pour le debug, à supprimer ensuite
-			Put(C);
-
 			New_Occurrence(D, C);
 			N := N + 1;
 		end loop;
-
-		-- Pour le debug, à supprimer ensuite
-		New_Line;
 
 		Close(Fichier);
 	end Lire_Fichier;
@@ -222,11 +217,6 @@ package body Huffman is
 			Insere(queue_arbre, -- Pour le debug, j'utilise la lettre du fils gauche
 					new Noeud'(Ada.Characters.Handling.To_Upper(fg.Lettre), fg, fd),
 					prio_g + prio_d);
-			Put (Integer'Image(prio_g));
-			Put (fg.Lettre);
-			Put (Integer'Image(prio_d));
-			Put (fd.Lettre);
-			new_Line;
 		end loop;
 		-- À ce point la, l'Arbre de huffman est le fils gauche
 		return fg;
@@ -312,9 +302,7 @@ package body Huffman is
 		Genere_Code(A, D);
 		Affiche(D);
 
--- 		H := new Internal_Huffman'(arb => A, nb_char => N);
-		H.A := A;
-		H.Nb_Total_Caracteres := N;
+   		H := new Internal_Huffman'(arb => A, dico => D, nb_char => N);
         return H;
 	end Cree_Huffman;
 
@@ -330,11 +318,11 @@ package body Huffman is
 		nom_fichier : String := "Tests/3a_4b_5c_6d_7e.txt";
 
 		arbre_solution : String := 
-			"┬─0─┬─0─┬─0─                            a:  ( 3 occurrences)" & ASCII.LF &
-			"│   │   └─1─                            b:  ( 4 occurrences)" & ASCII.LF &
-			"│   └─0─                                e:  ( 7 occurrences)" & ASCII.LF &
-			"└─1─┬─0─                                c:  ( 5 occurrences)" & ASCII.LF &
-			"│   └─1─                                d:  ( 6 occurrences)" & ASCII.LF ;
+			"┬─0─┬─0─                                c:  ( 5 occurrences)" & ASCII.LF &
+			"│   └─1─                                d:  ( 6 occurrences)" & ASCII.LF &
+			"└─1─┬─0─                                e:  ( 7 occurrences)" & ASCII.LF &
+			"│   └─1─┬─0─                            a:  ( 3 occurrences)" & ASCII.LF &
+			"│   │   └─1─                            b:  ( 4 occurrences)" & ASCII.LF ;
 	begin
 		Put_Line("~Lecture du fichier " & Nom_Fichier & " ~");
 		Lire_Fichier(Nom_Fichier, D, N);
@@ -345,22 +333,22 @@ package body Huffman is
 		Assert(Get_Occurrence(D, 'd') = 6, "Le nombre de d lu ne correspond pas");
 		Assert(Get_Occurrence(D, 'e') = 7, "Le nombre de e lu ne correspond pas");
 
-		Put_Line("~Initialisation de la file de priorite~");
 		Initialise_Queue_Arbre(queue_arbre, D);
-
-		Put_Line("~Génération de l'arbre de Huffman~");
 		A := Genere_Arbre(queue_arbre);
+
 		if To_String(To_Unbounded_String(A,D)) /= arbre_solution then
 			Put("L'arbre généré n'est pas le bon : " & ASCII.LF & ASCII.LF &
 				To_String(To_Unbounded_String(A, D)) & ASCII.LF & ASCII.LF &
 				"Au lieu de : " & ASCII.LF & ASCII.LF &
 				arbre_solution);
-			--Assert(false); à décommenter pour pouvoir utiliser le test
+			Assert(false);
 		end if;
 
-		--Put_Line("~Initialistation des codes de compressions~");
 		--Genere_Code(A, D);
 		--Affiche(D);
+		
+		Put_Line("~Les tests de l'arbre de huffman se sont bien passés ... OK~");
+		New_Line;
 	end Huffman_procedure_test;
 
 	-- Stocke un arbre dans un flux ouvert en ecriture
