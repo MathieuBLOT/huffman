@@ -32,15 +32,16 @@ package body Dico is
 	procedure Affiche(D : in Dico_Caracteres) is
 	begin
 		for I in D.T'First..D.T'Last loop
-            New_Line;
-			Put(I & " : ");	-- Print Character -> Morph into generic Put ?
-			Put(Integer'Image(D.T(I).Occurrence) & " occurrence(s)");
 			if D.T(I).Occurrence > 0 then
+                New_Line;
+                Put(I & " : ");	-- Print Character -> Morph into generic Put ?
+                Put(Integer'Image(D.T(I).Occurrence) & " occurrence(s)");
 				Put(", de code : ");
 				Put(To_String(To_Unbounded_String(D.T(I).Code)));
 				Put(".");
 			end if;
 		end loop;
+		new_Line;
 	end Affiche;
 
 
