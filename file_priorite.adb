@@ -16,8 +16,9 @@ package body File_Priorite is
 	end record;
 
 	procedure Libere is new Ada.Unchecked_Deallocation (File_Interne, File_Prio);
+	procedure Swap2(E1, E2 : in out Element_Tas);
 
-
+--------------------------------------------------------------------------------
 
 	-- Cree et retourne une nouvelle file, initialement vide
 	-- et de capacite maximale Capacite
@@ -49,6 +50,16 @@ package body File_Priorite is
 -- 		return F.Nombre = F.T'Length;
 		return F.Nombre = F.T'Last;	-- Au choix...
 	end Est_Pleine;
+
+    function Contient(F : in File_Prio; D : in Donnee) return Boolean is
+    begin
+        for i in F.T'Range loop
+            if F.T(i).Value = D then
+                return true;
+            end if;
+        end loop;
+        return false;
+    end Contient;
 
 	-- A NE PAS METTRE DANS L'API !
 	-- factorisation d'un échange entre 2 éléments de la file de priorité ;
@@ -100,8 +111,12 @@ package body File_Priorite is
 			P := F.T(F.Nombre).Prio;
 
 			F.Nombre := F.Nombre - 1;
-			-- Until it is a leaf						-- Left son should cliimb					-- Check the right son belongs to the heap	-- Right son should climb
-			while Index <= F.Nombre/2 AND THEN (Est_Prioritaire(F.T(2*Index).Prio, (F.T(Index).Prio)) OR ELSE (2*Index + 1 <= F.Nombre AND THEN Est_Prioritaire(F.T(2*Index + 1).Prio, F.T(Index).Prio))) loop
+			-- Until it is a leaf					    -- Left son should cliimb
+            -- Check the right son belongs to the heap	-- Right son should climb
+			while Index <= F.Nombre/2
+                    AND THEN (Est_Prioritaire(F.T(2*Index).Prio, (F.T(Index).Prio))
+                    OR ELSE (2*Index + 1 <= F.Nombre
+                    AND THEN Est_Prioritaire(F.T(2*Index + 1).Prio, F.T(Index).Prio))) loop
 				if Est_Prioritaire(F.T(2*Index).Prio, F.T(2*Index + 1).Prio) then
 					Swap2(F.T(Index), F.T(2*Index));
 					Index := 2*Index;
@@ -111,7 +126,6 @@ package body File_Priorite is
 				end if;
 			end loop;
 		else
--- 			Put_Line("La file est vide.");	-- En attendant
 			raise File_Prio_Vide;
 		end if;
 	end Supprime;

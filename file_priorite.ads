@@ -29,6 +29,9 @@ package File_Priorite is
 	-- retourne True si la file est pleine, False sinon
 	function Est_Pleine(F: in File_Prio) return Boolean;
 
+    -- retourne True si la file contient l'élément D
+    function Contient(F : in File_Prio; D : in Donnee) return Boolean;
+
 	-- si not Est_Pleine(F)
 	--   insere la donnee D de priorite P dans la file F
 	-- sinon

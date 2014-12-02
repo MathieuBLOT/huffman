@@ -56,6 +56,7 @@ begin
     while NOT Est_Vide(L) loop
         Supprime(L, Dc, P);
         Put_Line("L'élément sorti de la file est : " & Dc & ", " & Integer'Image(P));
+        Assert(not Contient(L, Dc), "L'élément n'est pas correctement supprimé de la file");
     end loop;
     Put_Line("****************************************");
 
@@ -70,7 +71,7 @@ begin
         => null; -- L'exception 'File_Prio_Vide' marche !
     end;
 
---- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+--------------------------------------------------------------------------------
 
     begin
         Prochain(L, Dc, P);
