@@ -88,6 +88,9 @@ procedure tp_huffman is
 			if Caractere_Trouve then
 				Character'Output(S_Out, Caractere);
 			end if;
+
+			Close(Fichier_In);
+			Close(Fichier_Out);
 		end loop;
 
 
