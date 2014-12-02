@@ -86,7 +86,8 @@ package body File_Priorite is
 			F.T(F.Nombre).Value := D;
 			F.T(F.Nombre).Prio := P;
 
-			while Index > F.T'First AND THEN Est_Prioritaire(F.T(Index).Prio, F.T(Index/2).Prio) loop
+			while Index > F.T'First
+                    AND THEN Est_Prioritaire(F.T(Index).Prio, F.T(Index/2).Prio) loop
 				Swap2(F.T(Index), F.T(Index/2));
 				Index := Index/2;
 			end loop;
