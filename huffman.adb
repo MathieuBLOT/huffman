@@ -7,6 +7,11 @@ use code, dico;
 
 package body Huffman is
 
+	package Priority_Queue is new File_Priorite(
+		Arbre,
+		Integer,
+		"<");
+	use Priority_Queue;
 
 	type Octet is new Integer range 0 .. 255;
 	for Octet'Size use 8; -- permet d'utiliser Octet'Input et Octet'Output,
@@ -31,7 +36,7 @@ package body Huffman is
 	procedure Lire_Fichier(Nom_Fichier : in String; D : out Dico_Caracteres;
 				N : out Integer);
 
-	procedure Genere_Code(D: in out Dico_Caracteres);
+	procedure Genere_Code(A: in Arbre; D: in out Dico_Caracteres);
 
 	-- Retourne un dictionnaire contenant les caracteres presents
 	-- dans l'arbre et leur code binaire (evite les parcours multiples)
@@ -52,6 +57,9 @@ package body Huffman is
 				Caractere : out Character);
 
 	function Est_Vide (A : in Arbre) return Boolean;
+	function Genere_Arbre(queue_arbre : File_Prio) return Arbre;
+	procedure Initialise_Queue_Arbre(queue_arbre : in out File_Prio;
+				D : in Dico_Caracteres);
 
 --------------------------------------------------------------------------------
 
@@ -182,9 +190,6 @@ package body Huffman is
 		Flux := Stream(Fichier);
 		N := 0;
 
-		New_Line;
-		Put_Line("~Lecture en cours du fichier " & nom_fichier & " ~");
-
 		Assert( not End_Of_File(Fichier), "Le fichier " & nom_fichier & " semble vide");
 
 		-- lecture tant qu'il reste des caracteres
@@ -200,20 +205,32 @@ package body Huffman is
 		Close(Fichier);
 	end Lire_Fichier;
 
-	procedure Genere_Code(D: in out Dico_Caracteres) is
-		package Priority_Queue is new File_Priorite(
-			Arbre,
-			Integer,
-			"<");
-		use Priority_Queue;
-
-		queue_arbre : constant File_Prio := Cree_File(256); -- Il faudrait utiliser un attribut tel que dico'last mais je ne sais pas comment l'utiliser
-		fg, fd, A : Arbre;
+	function Genere_Arbre(queue_arbre : File_Prio) return Arbre is
 		prio_g, prio_d : Integer;
-		nb_occur : Natural;
+		fg, fd : Arbre;
 	begin
-		Put_Line("~Initialisation de la file de priorite~");
+		-- On regroupe les deux noeuds de plus faible valeure et ainsi de suite
+		-- jusqu'à ce qu'on n'ai plus qu'un arbre unique
+		loop 
+			Supprime(queue_arbre, fg, prio_g);
+			exit when Est_Vide(queue_arbre);
+			Supprime(queue_arbre, fd, prio_d);
+			Insere(queue_arbre, -- Pour le debug, j'utilise la lettre du fils gauche
+					new Noeud'( fg.Lettre, fg, fd),
+					prio_g + prio_d);
+			Put (Integer'Image(prio_g + prio_d));
+			Put (fg.Lettre);
+			Put (fd.Lettre);
+			new_Line;
+		end loop;
+		-- À ce point la, l'Arbre de huffman est le fils gauche
+		return fg;
+	end Genere_Arbre;
 
+	procedure Initialise_Queue_Arbre(queue_arbre : in out File_Prio;
+				D : in Dico_Caracteres) is
+		nb_occur : Integer;
+	begin
 		-- On ajoute dans la file de priorite les futures feuille de l'arbre de huffman
 		-- Ce sont tous les caractères ayant au moins une occurence
 		for it_dico in Character'Range loop
@@ -226,27 +243,10 @@ package body Huffman is
 					   nb_occur);
 			end if;
 		end loop;
+	end Initialise_Queue_Arbre;
 
-		-- On regroupe les deux noeuds de plus faible valeure et ainsi de suite
-		-- jusqu'à ce qu'on n'ai plus qu'un arbre unique
-		loop
-			Supprime(queue_arbre, fg, prio_g);
-			exit when Est_Vide(queue_arbre);
-			Supprime(queue_arbre, fd, prio_d);
-			Insere(queue_arbre,
-					new Noeud'( fg.Lettre, fg, fd),
-					prio_g + prio_d);
-			--Put (Integer'Image(prio_g + prio_d));
-			--Put (fg.Lettre);
-			--Put (fd.Lettre);
-			--new_Line;
-		end loop;
-		-- À ce point la, l'Arbre de huffman est le fils gauche
-		A := fg;
-		Put_Line(To_String(To_Unbounded_String(A, D)));
-		new_Line;
-
-		Put_Line("~Initialistation de l'arbre de Huffman~");
+	procedure Genere_Code(A: in Arbre; D: in out Dico_Caracteres) is
+	begin
 		-- On génère les codes à partir de l'arbre de huffman
 		declare
 			procedure Internal_Genere_Code(A: in Arbre; C : in Code_Binaire;
@@ -273,8 +273,6 @@ package body Huffman is
 		begin
 			Internal_Genere_Code(A, Cree_Code, D);
 		end;
-
-		Affiche(D);
 	end Genere_Code;
 
 	-- Cree un arbre de Huffman a partir d'un fichier texte
@@ -287,9 +285,26 @@ package body Huffman is
 		N: Integer;
 
 		H: Arbre_Huffman;
+
+		A : Arbre;
+		queue_arbre : File_Prio := Cree_File(256); -- Il faudrait utiliser un attribut tel que dico'last mais je ne sais pas comment l'utiliser
+		
 	begin
+		Put_Line("~Lecture du fichier " & Nom_Fichier & " ~");
 		Lire_Fichier(Nom_Fichier, D, N);
-		Genere_Code(D);
+
+		Put_Line("~Initialisation de la file de priorite~");
+		Initialise_Queue_Arbre(queue_arbre, D);
+
+		Put_Line("~Génération de l'arbre de Huffman~");
+		A := Genere_Arbre(queue_arbre);
+		new_Line;
+		Put_Line(To_String(To_Unbounded_String(A, D)));
+		new_Line;
+
+		Put_Line("~Initialistation des codes de compressions~");
+		Genere_Code(A, D);
+		Affiche(D);
 
 		H := new Internal_Huffman'(dico => D, nb_char => N);
         return H;
