@@ -1,4 +1,4 @@
-with Ada.Text_IO, Ada.Unchecked_Deallocation, Ada.Assertions;
+with Ada.Text_IO, Ada.Unchecked_Deallocation, Ada.Assertions, Ada.Characters.Handling;
 use Ada.Text_IO, Ada.Assertions;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
@@ -24,7 +24,7 @@ package body Huffman is
 	end record;
 
 	type Internal_Huffman is record
-		dico : Dico_Caracteres;
+		arb : Arbre;
 		nb_char : Integer;
 	end record;
 
@@ -220,10 +220,11 @@ package body Huffman is
 			exit when Est_Vide(queue_arbre);
 			Supprime(queue_arbre, fd, prio_d);
 			Insere(queue_arbre, -- Pour le debug, j'utilise la lettre du fils gauche
-					new Noeud'( fg.Lettre, fg, fd),
+					new Noeud'(Ada.Characters.Handling.To_Upper(fg.Lettre), fg, fd),
 					prio_g + prio_d);
-			Put (Integer'Image(prio_g + prio_d));
+			Put (Integer'Image(prio_g));
 			Put (fg.Lettre);
+			Put (Integer'Image(prio_d));
 			Put (fd.Lettre);
 			new_Line;
 		end loop;
@@ -311,7 +312,7 @@ package body Huffman is
 		Genere_Code(A, D);
 		Affiche(D);
 
-		H := new Internal_Huffman'(dico => D, nb_char => N);
+		H := new Internal_Huffman'(arb => A, nb_char => N);
         return H;
 	end Cree_Huffman;
 
@@ -346,11 +347,10 @@ package body Huffman is
 		Put_Line("~Génération de l'arbre de Huffman~");
 		A := Genere_Arbre(queue_arbre);
 		if To_String(To_Unbounded_String(A,D)) /= arbre_solution then
-			Put(
-					"L'arbre généré n'est pas le bon : " & ASCII.LF & ASCII.LF &
-					To_String(To_Unbounded_String(A, D)) & ASCII.LF & ASCII.LF &
-					"Au lieu de : " & ASCII.LF & ASCII.LF &
-					arbre_solution);
+			Put("L'arbre généré n'est pas le bon : " & ASCII.LF & ASCII.LF &
+				To_String(To_Unbounded_String(A, D)) & ASCII.LF & ASCII.LF &
+				"Au lieu de : " & ASCII.LF & ASCII.LF &
+				arbre_solution);
 			--Assert(false); à décommenter pour pouvoir utiliser le test
 		end if;
 
