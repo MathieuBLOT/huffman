@@ -6,6 +6,7 @@ exemple_io*
 test_code
 test_file_priorite
 tp_huffman
+test_huffman
 
 # Object file
 *.o

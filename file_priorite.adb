@@ -53,7 +53,7 @@ package body File_Priorite is
 
     function Contient(F : in File_Prio; D : in Donnee) return Boolean is
     begin
-        for i in F.T'first .. F.T'first + F.Nombre -1 loop
+        for i in F.T'First .. F.T'First + F.Nombre - 1 loop
             if F.T(i).Value = D then
                 return true;
             end if;
@@ -120,7 +120,7 @@ package body File_Priorite is
                 fd_existe := 2*Index + 1 <= F.T'First + F.Nombre - 1;
                 fd_est_prio := fd_existe and then Est_Prioritaire(F.T(2*Index + 1).Prio, F.T(Index).Prio);
 
-                exit when not (fg_est_prio and fd_est_prio);
+                exit when not (fg_est_prio or fd_est_prio);
 
 				if Est_Prioritaire(F.T(2*Index).Prio, F.T(2*Index + 1).Prio) then
 					Swap2(F.T(Index), F.T(2*Index));
