@@ -1,4 +1,4 @@
-with Ada.Integer_Text_IO, Ada.Text_IO, file_priorite, Ada.Unchecked_Deallocation;
+with Ada.Integer_Text_IO, Ada.Text_IO, file_priorite, dico, code, Ada.Unchecked_Deallocation;
 use Ada.Integer_Text_IO, Ada.Text_IO;
 
 package body Huffman is
@@ -24,9 +24,10 @@ package body Huffman is
 	end record;
 
 	procedure Libere is new Ada.Unchecked_Deallocation (Noeud, Arbre);
-	procedure Insere_Noeud(C : in Character; P : in Integer; H : in out Arbre_Huffman);
+-- 	procedure Insere_Noeud(C : in Character; P : in Integer; H : in out Arbre_Huffman);
 	function Est_Vide (A : in Arbre) return Boolean;
 	procedure Generate_Dictionary(A : in Arbre; D: in out Dico_Caracteres);
+	function Create_Character_Node(C : in Character; P : in Integer) return Arbre;
 
 --------------------------------------------------------------------------------
 
@@ -79,25 +80,31 @@ package body Huffman is
         Affiche(H.A);
 	end Affiche;
 
-	procedure Insere_Noeud(C : in Character; P : in Integer; H : in out Arbre_Huffman) is
+-- 	procedure Insere_Noeud(C : in Character; P : in Integer; H : in out Arbre_Huffman) is
+-- 	begin
+--         null;
+--
+--         --
+--         -- À fixer
+--         --
+--
+-- 		--if H.A = null then
+-- 			--H.A := new Noeud'(C, P, null, null);
+-- 		--else
+-- 			--if H.A.FilsG = null then
+-- 				--Insere_Noeud(C, P, H.A.FilsG);
+-- 			--else
+-- 				--Insere_Noeud(C, P, H.A.FilsD);
+-- 			--end if;
+-- 		--end if;
+-- 	end Insere_Noeud;
+
+	-- Create nodes (=elements of the priority queue)
+	function Create_Character_Node(C : in Character; P : in Integer) return Arbre is
+		N: Arbre := new Noeud'(C, P, null, null);
 	begin
-        null;
-
-        --
-        -- À fixer
-        --
-
-		--if H.A = null then
-			--H.A := new Noeud'(C, P, null, null);
-		--else
-			--if H.A.FilsG = null then
-				--Insere(C, P, H.A.FilsG);
-			--else
-				--Insere(C, P, H.A.FilsD);
-			--end if;
-		--end if;
-	end Insere_Noeud;
-
+		return N;
+	end Create_Character_Node;
 
 	-- Cree un arbre de Huffman a partir d'un fichier texte
 	-- Cette function lit le fichier et compte le nb d'occurences des
@@ -115,6 +122,8 @@ package body Huffman is
 		H: Arbre_Huffman;
 		--Character_Buffer1: Character;
 		--Character_Buffer2: Character;
+		Tree_Buffer1: Arbre;
+		Tree_Buffer2: Arbre;
 		Priority_Buffer1: Integer;
 		Priority_Buffer2: Integer;
 	begin
@@ -140,7 +149,10 @@ package body Huffman is
 --
 --
 -- 			-- to fix
-   			null;
+   		--	null;
+
+			Insere(F, Create_Character_Node(C, Get_Occurrence(D, C)), Get_Occurrence(D, C));
+
 --
 			--Insere(F, Insere_Noeud(C, Get_Occurrence(D, C), H.A), Get_Occurrence(D, C));	-- Insert Character in Priority_Queue
 
@@ -151,10 +163,21 @@ package body Huffman is
 			--Supprime(F, Character_Buffer1, Priority_Buffer1);
 			--Supprime(F, Character_Buffer2, Priority_Buffer2);	-- To test for exception...
 
+			Supprime(F, Tree_Buffer1, Priority_Buffer1);	-- There's at least 1 element...
+			if NOT Est_Vide(F) then
+				Supprime(F, Tree_Buffer2, Priority_Buffer2);	-- To test for exception (ex: only 1 node (~tree) in Priority_Queue)...
+			else
+				Priority_Buffer2 := 0;
+				Tree_Buffer2 := null;	-- Security : Second element as inexistant
+			end if;
+
 			--				Random character... I'm super duper inspired...
-			H.A := new Noeud'('~', Priority_Buffer1 + Priority_Buffer2, null, null);
+			--H.A := new Noeud'('~', Priority_Buffer1 + Priority_Buffer2, null, null);
 			--Insere_Noeud(Character_Buffer1, Priority_Buffer1, H);
 			--Insere_Noeud(Character_Buffer2, Priority_Buffer2, H);
+
+
+			H.A := new Noeud'('~', Priority_Buffer1 + Priority_Buffer2, Tree_Buffer1, Tree_Buffer2);
 
 			Insere(F, H.A, Priority_Buffer1 + Priority_Buffer2);	-- Normally, replaceable with H.A.Poids
 		end loop;
@@ -170,7 +193,7 @@ package body Huffman is
 		Fichier : Ada.Streams.Stream_IO.File_Type;
 		stream : Ada.Streams.Stream_IO.Stream_Access;
 		NbOctets: constant Positive := 0;
-		O: Octet;
+		O: Octet := 0;
         Nom_Fichier : String := ""; -- fix
 	begin
 		Create(Fichier, Out_File, Nom_Fichier);
