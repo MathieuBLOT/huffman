@@ -39,7 +39,7 @@ procedure tp_huffman is
 
 	procedure Decompresse(Nom_Fichier_In, Nom_Fichier_Out : in String) is
 		H : Arbre_Huffman;
--- 		Tree : Arbre;
+		Tree : Arbre;
 		Caractere_Trouve : Boolean := false;
 		Caractere : Character;
 
@@ -59,8 +59,8 @@ procedure tp_huffman is
 		Create(Fichier_Out, Out_File, Nom_Fichier_Out);
 		S_Out := Stream(Fichier_Out);
 
--- 		H := Lit_Huffman(S_In);
--- 		Tree := H.A;
+		H := Lit_Huffman(S_In);
+		Tree := H.A;
 
 		-- On génère une liste de bits (tout le ficier)
 		while not End_Of_File(Fichier_In) loop
@@ -83,11 +83,11 @@ procedure tp_huffman is
 			end loop;
 
 			--	On le fait à partir de Tree et non pas H.A au cas où un code est à cheval sur 2 bytes
--- 			Get_Caractere(It, Tree, Caractere_Trouve, Caractere);
+			Get_Caractere(It, Tree, Caractere_Trouve, Caractere);
 
--- 			if Caractere_Trouve then
--- 				Character'Output(S_Out, Caractere);
--- 			end if;
+			if Caractere_Trouve then
+				Character'Output(S_Out, Caractere);
+			end if;
 
 			Close(Fichier_In);
 			Close(Fichier_Out);

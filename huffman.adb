@@ -2,8 +2,8 @@ with Ada.Text_IO, Ada.Unchecked_Deallocation, Ada.Assertions, Ada.Characters.Han
 use Ada.Text_IO, Ada.Assertions;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with code, dico, file_priorite;
-use code, dico;
+with dico, file_priorite;
+use dico;
 
 package body Huffman is
 
@@ -23,10 +23,10 @@ package body Huffman is
 		FilsD: Arbre;
 	end record;
 
-	type Internal_Huffman is record
-		arb : Arbre;
-		nb_char : Integer;
-	end record;
+-- 	type Internal_Huffman is record
+-- 		arb : Arbre;
+-- 		nb_char : Integer;
+-- 	end record;
 
 	procedure Libere is new Ada.Unchecked_Deallocation (Noeud, Arbre);
 	function Est_une_Feuille(A : in Arbre) return Boolean;
@@ -44,17 +44,17 @@ package body Huffman is
 	--function Genere_Dictionnaire(H : in Arbre_Huffman) return Dico_Caracteres;
 
 
--- Parcours a l'aide d'un iterateur sur un code, en partant du noeud A
---  * Si un caractere a ete trouve il est retourne dans Caractere et
---    Caractere_Trouve vaut True. Le code n'a eventuellement pas ete
---    totalement parcouru. A est une feuille.
---  * Si l'iteration est terminee (plus de bits a parcourir ds le code)
---    mais que le parcours s'est arrete avant une feuille, alors
---    Caractere_Trouve vaut False, Caractere est indetermine
---    et A est le dernier noeud atteint.
-	procedure Get_Caractere(It_Code : in Iterateur_Code; A : in out Arbre;
-				Caractere_Trouve : out Boolean;
-				Caractere : out Character);
+-- -- Parcours a l'aide d'un iterateur sur un code, en partant du noeud A
+-- --  * Si un caractere a ete trouve il est retourne dans Caractere et
+-- --    Caractere_Trouve vaut True. Le code n'a eventuellement pas ete
+-- --    totalement parcouru. A est une feuille.
+-- --  * Si l'iteration est terminee (plus de bits a parcourir ds le code)
+-- --    mais que le parcours s'est arrete avant une feuille, alors
+-- --    Caractere_Trouve vaut False, Caractere est indetermine
+-- --    et A est le dernier noeud atteint.
+-- 	procedure Get_Caractere(It_Code : in Iterateur_Code; A : in out Arbre;
+-- 				Caractere_Trouve : out Boolean;
+-- 				Caractere : out Character);
 
 	function Est_Vide (A : in Arbre) return Boolean;
 	function Genere_Arbre(queue_arbre : File_Prio) return Arbre;
@@ -312,7 +312,9 @@ package body Huffman is
 		Genere_Code(A, D);
 		Affiche(D);
 
-		H := new Internal_Huffman'(arb => A, nb_char => N);
+-- 		H := new Internal_Huffman'(arb => A, nb_char => N);
+		H.A := A;
+		H.Nb_Total_Caracteres := N;
         return H;
 	end Cree_Huffman;
 
@@ -391,6 +393,16 @@ package body Huffman is
 
 		return NbOctets;
 	end Ecrit_Huffman;
+
+
+	-- Lit un arbre stocke dans un flux ouvert en lecture
+	-- Le format de stockage est celui decrit dans le sujet
+	function Lit_Huffman(Flux : Ada.Streams.Stream_IO.Stream_Access) return Arbre_Huffman is
+		H: Arbre_Huffman;
+	begin
+		-- STUB
+		return H;
+	end Lit_Huffman;
 
 
 ------ Parcours de l'arbre (decodage)
