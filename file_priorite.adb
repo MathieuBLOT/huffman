@@ -53,7 +53,7 @@ package body File_Priorite is
 
     function Contient(F : in File_Prio; D : in Donnee) return Boolean is
     begin
-        for i in F.T'first .. F.T'first + F.Nombre loop
+        for i in F.T'first .. F.T'first + F.Nombre -1 loop
             if F.T(i).Value = D then
                 return true;
             end if;
