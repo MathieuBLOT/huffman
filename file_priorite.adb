@@ -104,20 +104,24 @@ package body File_Priorite is
 	--   leve l'exception File_Vide
 	procedure Supprime(F: in File_Prio; D: out Donnee; P: out Priorite) is
 		Index: Integer := F.T'First;	-- The algorithm begins at the root
-	begin
-		if NOT Est_Vide(F) then
-			Swap2(F.T(F.T'First), F.T(F.Nombre));
+        fg_est_prio, fd_est_prio, fd_existe: Boolean;
+        begin
+        if NOT Est_Vide(F) then
+        D := F.T(F.T'First).Value;
+        P := F.T(F.T'First).Prio;
 
-			D := F.T(F.Nombre).Value;
-			P := F.T(F.Nombre).Prio;
+        Swap2(F.T(F.T'First), F.T(F.Nombre));
 
-			F.Nombre := F.Nombre - 1;
-			-- Until it is a leaf					    -- Left son should cliimb
-            -- Check the right son belongs to the heap	-- Right son should climb
-			while Index <= F.Nombre/2
-                    AND THEN (Est_Prioritaire(F.T(2*Index).Prio, (F.T(Index).Prio))
-                    OR ELSE (2*Index + 1 <= F.Nombre
-                    AND THEN Est_Prioritaire(F.T(2*Index + 1).Prio, F.T(Index).Prio))) loop
+        F.Nombre := F.Nombre - 1;
+        -- Until it is a leaf					    -- Left son should cliimb
+        -- Check the right son belongs to the heap	-- Right son should climb
+        while Index <= F.Nombre/2 loop
+                fg_est_prio := Est_Prioritaire(F.T(2*Index).Prio, F.T(Index).Prio);
+                fd_existe := 2*Index + 1 <= F.T'First + F.Nombre - 1;
+                fd_est_prio := fd_existe and then Est_Prioritaire(F.T(2*Index + 1).Prio, F.T(Index).Prio);
+
+                exit when not (fg_est_prio and fd_est_prio);
+
 				if Est_Prioritaire(F.T(2*Index).Prio, F.T(2*Index + 1).Prio) then
 					Swap2(F.T(Index), F.T(2*Index));
 					Index := 2*Index;
