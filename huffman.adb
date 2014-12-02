@@ -24,8 +24,6 @@ package body Huffman is
 	end record;
 
 	procedure Libere is new Ada.Unchecked_Deallocation (Noeud, Arbre);
-
-	function Est_Vide (A : in Arbre) return Boolean;
 	function Est_une_Feuille(A : in Arbre) return Boolean;
 
 	-- Lit un arbre stocke dans un flux ouvert en lecture
@@ -53,6 +51,7 @@ package body Huffman is
 				Caractere_Trouve : out Boolean;
 				Caractere : out Character);
 
+	function Est_Vide (A : in Arbre) return Boolean;
 
 --------------------------------------------------------------------------------
 
@@ -293,7 +292,6 @@ package body Huffman is
 		Genere_Code(D);
 
 		H := new Internal_Huffman'(dico => D, nb_char => N);
-
         return H;
 	end Cree_Huffman;
 
@@ -302,14 +300,22 @@ package body Huffman is
 	-- Retourne le nb d'octets ecrits dans le flux (pour les stats)
 	function Ecrit_Huffman(H : in Arbre_Huffman; stream : Stream_Access) return Natural is
 		Fichier : Ada.Streams.Stream_IO.File_Type;
-		NbOctets: constant Natural := 0;
+		NbOctets: Natural := 0;
 		O: Octet;
         Nom_Fichier : String := ""; -- fix
 	begin
 		Create(Fichier, Out_File, Nom_Fichier);
 		--stream := Stream(Fichier);
+		Put_Line("~Stockage de l'arbre en cours~");
 
-		Put("~Ecriture en cours~");
+		for C in 0..128 loop
+-- 			Check number of Occurrences ?
+			Character'Output(stream, Character'Val(C));
+-- 			Longueur du code binaire correspondant au caractère -> Dico ?
+			NbOctets := NbOctets + 1;
+		end loop;
+
+		Put_Line("~Ecriture en cours~");
 
 		--Integer'Output(stream, I1);
 		Octet'Output(stream, O);
