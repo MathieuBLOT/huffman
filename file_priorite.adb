@@ -122,6 +122,7 @@ package body File_Priorite is
 
                 exit when not (fg_est_prio or fd_est_prio);
 
+                -- Si on arrive là, IL Y A un prioritaire ; seulement, l'un des fils n'existe peut-être pas...
 				if (not fd_existe) or else Est_Prioritaire(F.T(2*Index).Prio, F.T(2*Index + 1).Prio) then
 					Swap2(F.T(Index), F.T(2*Index));
 					Index := 2*Index;
