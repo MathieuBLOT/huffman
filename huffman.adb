@@ -23,10 +23,11 @@ package body Huffman is
 		FilsD: Arbre;
 	end record;
 
--- 	type Internal_Huffman is record
--- 		arb : Arbre;
--- 		nb_char : Integer;
--- 	end record;
+   	type Internal_Huffman is record
+   		arb : Arbre;
+		dico : Dico_Caracteres;
+   		nb_char : Integer;
+   	end record;
 
 	procedure Libere is new Ada.Unchecked_Deallocation (Noeud, Arbre);
 	function Est_une_Feuille(A : in Arbre) return Boolean;
@@ -174,7 +175,7 @@ package body Huffman is
 
 	procedure Affiche(H : in Arbre_Huffman) is
 	begin
-		--Put_Line(To_Unbounded_String(A));
+		--Put_Line(To_String(To_Unbounded_String(H.arb, H.dico)));
 		null;
 	end Affiche;
 
@@ -312,9 +313,7 @@ package body Huffman is
 		Genere_Code(A, D);
 		Affiche(D);
 
--- 		H := new Internal_Huffman'(arb => A, nb_char => N);
-		H.A := A;
-		H.Nb_Total_Caracteres := N;
+   		H := new Internal_Huffman'(arb => A, dico => D, nb_char => N);
         return H;
 	end Cree_Huffman;
 
@@ -327,13 +326,14 @@ package body Huffman is
 		A : Arbre;
 		queue_arbre : File_Prio := Cree_File(256); -- Il faudrait utiliser un attribut tel que dico'last mais je ne sais pas comment l'utiliser
 
-		nom_fichier : String := "Tests/3a_4b_5c_6d.txt";
+		nom_fichier : String := "Tests/3a_4b_5c_6d_7e.txt";
 
-		arbre_solution : String :=
-				"┬─0─┬─0─                                a:  ( 3 occurrences)" & ASCII.LF &
-				"│   └─1─                                b:  ( 4 occurrences)" & ASCII.LF &
-				"└─1─┬─0─                                c:  ( 5 occurrences)" & ASCII.LF &
-				"│   └─1─                                d:  ( 6 occurrences)" & ASCII.LF ;
+		arbre_solution : String := 
+			"┬─0─┬─0─                                c:  ( 5 occurrences)" & ASCII.LF &
+			"│   └─1─                                d:  ( 6 occurrences)" & ASCII.LF &
+			"└─1─┬─0─                                e:  ( 7 occurrences)" & ASCII.LF &
+			"│   └─1─┬─0─                            a:  ( 3 occurrences)" & ASCII.LF &
+			"│   │   └─1─                            b:  ( 4 occurrences)" & ASCII.LF ;
 	begin
 		Put_Line("~Lecture du fichier " & Nom_Fichier & " ~");
 		Lire_Fichier(Nom_Fichier, D, N);
@@ -342,6 +342,7 @@ package body Huffman is
 		Assert(Get_Occurrence(D, 'b') = 4, "Le nombre de b lu ne correspond pas");
 		Assert(Get_Occurrence(D, 'c') = 5, "Le nombre de c lu ne correspond pas");
 		Assert(Get_Occurrence(D, 'd') = 6, "Le nombre de d lu ne correspond pas");
+		Assert(Get_Occurrence(D, 'e') = 7, "Le nombre de e lu ne correspond pas");
 
 		Put_Line("~Initialisation de la file de priorite~");
 		Initialise_Queue_Arbre(queue_arbre, D);
@@ -353,7 +354,7 @@ package body Huffman is
 				To_String(To_Unbounded_String(A, D)) & ASCII.LF & ASCII.LF &
 				"Au lieu de : " & ASCII.LF & ASCII.LF &
 				arbre_solution);
-			--Assert(false); à décommenter pour pouvoir utiliser le test
+			Assert(false);
 		end if;
 
 		--Put_Line("~Initialistation des codes de compressions~");

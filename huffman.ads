@@ -7,15 +7,7 @@ use code;
 package Huffman is
 
 	type Arbre is private;
---     type Arbre_Huffman is private;
-
-	type Arbre_Huffman is record
-		-- l'arbre de Huffman proprement dit
-		A : Arbre;
-		-- autres infos utiles: nb total de caracteres lus, ...
-		Nb_Total_Caracteres : Natural;
-		-- A completer selon vos besoins!
-	end record;
+    type Arbre_Huffman is private;
 
 	-- Libere l'arbre de racine A.
 	-- garantit: en sortie toute la memoire a ete libere, et A = null.
@@ -58,10 +50,10 @@ package Huffman is
 private
 
 	type Noeud;
---     type Internal_Huffman;
+    type Internal_Huffman;
 
 	type Arbre is Access Noeud;
---     type Arbre_Huffman is Access Internal_Huffman;
+    type Arbre_Huffman is Access Internal_Huffman;
 
 end Huffman;
 
