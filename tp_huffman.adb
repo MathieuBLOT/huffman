@@ -7,6 +7,7 @@ use huffman, dico, code;
 procedure tp_huffman is
 
 	type Code_Buffer is array (Integer range 0..7) of Integer;
+-- 	type Length_Buffer is array (Integer range 0..7) of Natural;
 
 	type Octet is new Integer range 0 .. 255;
 	for Octet'Size use 8;
@@ -20,8 +21,14 @@ procedure tp_huffman is
 		D : Dico_Caracteres := Cree_Dico;
 		Nb_Octets_Ecrits : Natural := 0;
 
-		Code_Buffer := Cree_Code;	-- Code de chaque caractere
-		Code_Seq := Cree_Code;	-- Code de plusieurs caracteres (cible : un octet)
+		Code_Tmp : Code_Binaire := Cree_Code;	-- Code de chaque caractere
+-- 		Lengths : Length_Buffer;
+-- 		Nb_Codes : Integer := 0;
+		Code_Seq : Code_Binaire := Cree_Code;	-- Code de plusieurs caracteres (cible : un octet)
+
+		Bit_in_Code_Number : Natural := 0;	-- Number of the bit in the code
+		Byte_Buffer : Octet := 0;
+		It : Iterateur_Code;
 
 		S_In : Stream_Access;
 		Fichier_In: Ada.Streams.Stream_IO.File_Type;
@@ -43,10 +50,31 @@ procedure tp_huffman is
 		-- lecture tant qu'il reste des caracteres
 		while not End_Of_File(Fichier_In) loop
 			C := Character'Input(S_In);
-			Put(", "); Put(C);
+			Code_Tmp := Get_Code(C, D);
+-- 			Lengths(Nb_Codes) := Longueur(Code_Buffer);
+			Ajoute_Apres(Code_Tmp, Code_Seq);
 		end loop;
 
 		Close(Fichier_In);
+
+		It := Cree_Iterateur(Code_Seq);
+		while Has_Next(It) loop
+			if Next(It) = UN then
+				Byte_Buffer := Byte_Buffer + Octet(2**Bit_in_Code_Number);	-- Exponent (2^I)
+			end if;
+			Bit_in_Code_Number := Bit_in_Code_Number + 1;
+
+			if Bit_in_Code_Number = 8 then	-- mod do not suffice : we must check an overflow occurred
+				Bit_in_Code_Number := 0;
+				Octet'Output(S_Out, Byte_Buffer);
+			end if;
+		end loop;
+
+		if Bit_in_Code_Number /= 0 then
+			Byte_Buffer := Byte_Buffer + Octet(2**(8 - Bit_in_Code_Number));-- We complete the end with 0s (as much as necessary)
+			Octet'Output(S_Out, Byte_Buffer);
+		end if;
+
 		Close(Fichier_Out);
 	end Compresse;
 
