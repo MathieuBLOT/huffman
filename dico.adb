@@ -8,6 +8,7 @@ package body Dico is
 
 	type Dico_Caracteres_Interne is record
 		Number: Natural;	-- Number of different characters
+		Total_Number: Natural;	-- Number of total characters
 		T: Tab(Character'Val(0)..Character'Val(255));
 	end record;
 
@@ -18,6 +19,7 @@ package body Dico is
 		D: constant Dico_Caracteres := new Dico_Caracteres_Interne;
 	begin
 		D.Number := 0;
+		D.Total_Number := 0;
 		return D;
 	end Cree_Dico;
 
@@ -55,6 +57,7 @@ package body Dico is
 		if D.T(C).Occurrence = 0 then
 			D.Number := D.Number + 1;
 		end if;
+		D.Total_Number := D.Total_Number + 1;
 		D.T(C).Occurrence := D.T(C).Occurrence +1;
 	end New_Occurrence;
 
@@ -122,12 +125,13 @@ package body Dico is
 	-- Retourne le nombre total de caracteres
 	--  =  somme des nombre d'occurences de tous les caracteres de D
 	function Nb_Total_Caracteres(D : in Dico_Caracteres) return Natural is
-		Nb: Natural := 0;
+-- 		Nb: Natural := 0;
 	begin
-		for I in D.T'First..D.T'Last loop
-			Nb := Nb + D.T(I).Occurrence;
-		end loop;
-        return Nb;
+-- 		for I in D.T'First..D.T'Last loop
+-- 			Nb := Nb + D.T(I).Occurrence;
+-- 		end loop;
+--         return Nb;
+		return D.Total_Number;
 	end Nb_Total_Caracteres;
 
 end Dico;
