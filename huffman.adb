@@ -315,14 +315,27 @@ package body Huffman is
 		A : Arbre;
 		queue_arbre : File_Prio := Cree_File(256); -- Il faudrait utiliser un attribut tel que dico'last mais je ne sais pas comment l'utiliser
 
-		nom_fichier : String := "Tests/3a_4b_5c_6d_7e.txt";
+		nom_fichier : constant String := "Tests/3a_4b_5c_6d_7e.txt";
+		nom_fichier_compress : constant String := "Tests/3a_4b_5c_6d_7e.compress.txt";
 
-		arbre_solution : String := 
+		fichier_compress : Ada.Streams.Stream_IO.File_Type;
+		stream_compress : Ada.Streams.Stream_IO.Stream_Access;
+
+		arbre_solution : constant String := 
 			"┬─0─┬─0─                                c:  ( 5 occurrences)" & ASCII.LF &
 			"│   └─1─                                d:  ( 6 occurrences)" & ASCII.LF &
 			"└─1─┬─0─                                e:  ( 7 occurrences)" & ASCII.LF &
 			"│   └─1─┬─0─                            a:  ( 3 occurrences)" & ASCII.LF &
 			"│   │   └─1─                            b:  ( 4 occurrences)" & ASCII.LF ;
+
+		arbre_solution_avec_code : constant String := 
+			"┬─0─┬─0─                                c: 00 ( 5 occurrences)" & ASCII.LF &
+			"│   └─1─                                d: 10 ( 6 occurrences)" & ASCII.LF &
+			"└─1─┬─0─                                e: 01 ( 7 occurrences)" & ASCII.LF &
+			"│   └─1─┬─0─                            a: 011 ( 3 occurrences)" & ASCII.LF &
+			"│   │   └─1─                            b: 111 ( 4 occurrences)" & ASCII.LF ;
+
+		NbCarac : Natural := 0;
 	begin
 		Put_Line("~Lecture du fichier " & Nom_Fichier & " ~");
 		Lire_Fichier(Nom_Fichier, D, N);
@@ -344,8 +357,16 @@ package body Huffman is
 			Assert(false);
 		end if;
 
-		--Genere_Code(A, D);
-		--Affiche(D);
+		Genere_Code(A, D);
+		if To_String(To_Unbounded_String(A,D)) /= arbre_solution_avec_code then
+			Put("L'arbre généré n'est pas le bon : " & ASCII.LF & ASCII.LF &
+				To_String(To_Unbounded_String(A, D)) & ASCII.LF & ASCII.LF &
+				"Au lieu de : " & ASCII.LF & ASCII.LF &
+				arbre_solution_avec_code);
+			Assert(false);
+		end if;
+
+   		H := new Internal_Huffman'(arb => A, dico => D, nb_char => N);
 		
 		Put_Line("~Les tests de l'arbre de huffman se sont bien passés ... OK~");
 		New_Line;
