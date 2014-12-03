@@ -1,8 +1,8 @@
 with Ada.Text_Io, Ada.Command_Line, Ada.Streams.Stream_IO;
 use Ada.Text_Io, Ada.Command_Line, Ada.Streams.Stream_IO;
 
-with huffman, code;
-use huffman, code;
+with huffman, dico, code;
+use huffman, dico, code;
 
 procedure tp_huffman is
 
@@ -17,7 +17,11 @@ procedure tp_huffman is
 
 	procedure Compresse(Nom_Fichier_In, Nom_Fichier_Out : in String) is
 		H : Arbre_Huffman;
+		D : Dico_Caracteres := Cree_Dico;
 		Nb_Octets_Ecrits : Natural := 0;
+
+		Code_Buffer := Cree_Code;	-- Code de chaque caractere
+		Code_Seq := Cree_Code;	-- Code de plusieurs caracteres (cible : un octet)
 
 		S_In : Stream_Access;
 		Fichier_In: Ada.Streams.Stream_IO.File_Type;
@@ -30,10 +34,20 @@ procedure tp_huffman is
 		S_Out := Stream(Fichier_Out);
 
 		H := Cree_Huffman(Fichier_In);
+		D = Genere_Dictionnaire(H);
 
 		Nb_Octets_Ecrits := Ecrit_Huffman(H, S_Out);
 
 		Put_Line("# " & Natural'Image(Nb_Octets_Ecrits) & " octets ont été écrits en entête (Huffman Tree) #");
+
+		-- lecture tant qu'il reste des caracteres
+		while not End_Of_File(Fichier_In) loop
+			C := Character'Input(S_In);
+			Put(", "); Put(C);
+		end loop;
+
+		Close(Fichier_In);
+		Close(Fichier_Out);
 	end Compresse;
 
 
