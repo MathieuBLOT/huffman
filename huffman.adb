@@ -1,7 +1,7 @@
 with Ada.Text_IO, Ada.Unchecked_Deallocation, Ada.Assertions, Ada.Characters.Handling;
 use Ada.Text_IO, Ada.Assertions;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-
+with Ada.Unchecked_Conversion;
 with dico, file_priorite;
 use dico;
 
@@ -66,6 +66,94 @@ package body Huffman is
 	procedure Initialise_Queue_Arbre(queue_arbre : in out File_Prio;
 				D : in Dico_Caracteres);
 	function Ecrit_EnTete(H : Arbre_Huffman; stream : Stream_Access) return Natural;
+	package Stream_Buffer is
+		type Stream_Buffer is private;
+		function Cree_Stream_Buffer(S : Stream_Access) return Stream_Buffer;
+		function Get_Bit(S : Stream_Buffer) return Code.Bit;
+		procedure Write_Char(S : Stream_Buffer; C : Code_Binaire);
+		function Read_Char(S : Stream_Buffer; A : Arbre) return Character;
+	private
+		type Stream_Buffer_Internal;
+		type Stream_Buffer is access Stream_Buffer_Internal;
+	end Stream_Buffer;
+
+	package body Stream_Buffer is
+		type Bit_Number is range 0 .. 7;
+		type Octet is array (Bit_Number) of Bit;
+		pragma Pack (Octet);
+		function To_Octet is new Ada.Unchecked_Conversion(
+						Source => Integer,
+						Target => Octet);
+		function To_Integer is new Ada.Unchecked_Conversion(
+						Source => Octet,
+						Target => Integer);
+
+		--type Octet is mod 256;
+
+		type Stream_Buffer_Internal(S: Stream_Access) is record
+			O : Octet;
+			bit_courant : Bit_Number := 0;
+			stream : Stream_Access := S;
+		end record;
+
+		-----------------------------------------------------------------------------
+
+		procedure Libere is new Ada.Unchecked_Deallocation (Stream_Buffer_Internal,
+						Stream_Buffer);
+
+		function Cree_Stream_Buffer(S : Stream_Access) return Stream_Buffer is
+		begin
+			-- On n'extrait pas tout de suite le premier bit. Cela sera fait
+			-- lors du premier appel à Get_Bit
+			return new Stream_Buffer_Internal(S); 
+		end Cree_Stream_Buffer;
+
+		function Get_Bit(S : Stream_Buffer) return Code.Bit is
+		begin
+			if S.bit_courant = Bit_Number'Last then
+				S.o := Octet'Input(S.stream);
+				S.bit_courant := 0;
+			else
+				S.bit_courant := S.bit_courant + 1;
+			end if;
+
+			return S.o(S.bit_courant);
+		end Get_Bit;
+
+		procedure Write_Char(S : Stream_Buffer; C : Code_Binaire) is
+			it : constant Iterateur_Code := Cree_Iterateur(C);
+		begin
+			while Has_Next(it) loop
+				S.O(S.bit_courant) := Next(it);
+				if S.bit_courant = Bit_Number'Last then
+					Octet'Output(S.stream, S.O);
+					S.bit_courant := 0;
+				else
+					S.bit_courant := S.bit_courant + 1;
+				end if;
+			end loop;
+		end Write_Char;
+
+		function Read_Char(S : Stream_Buffer; A : Arbre) return Character is
+			child : Arbre;
+			bit : Code.Bit;
+		begin
+			bit := Get_Bit(S);
+			if bit = ZERO then
+				child := A.filsG;
+			else
+				child := A.filsD;
+			end if;
+
+			if Est_une_Feuille(child) then
+				return child.lettre;
+			else
+				return Read_Char(S, child);
+			end if;
+		end Read_Char;
+
+	end Stream_Buffer;
+
 
 --------------------------------------------------------------------------------
 
