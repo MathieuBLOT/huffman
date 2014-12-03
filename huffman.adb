@@ -29,6 +29,9 @@ package body Huffman is
    		nb_char : Integer;
    	end record;
 
+	FIN_EN_TETE_1 : constant Character := '-';
+	FIN_EN_TETE_2 : constant Integer := -1;
+
 	procedure Libere is new Ada.Unchecked_Deallocation (Noeud, Arbre);
 	function Est_une_Feuille(A : in Arbre) return Boolean;
 
@@ -36,6 +39,7 @@ package body Huffman is
 	-- Le format de stockage est celui decrit dans le sujet
 	procedure Lire_Fichier(Nom_Fichier : in String; D : out Dico_Caracteres;
 				N : out Integer);
+	function Lit_EnTete(stream : in Stream_Access) return Dico_Caracteres;
 
 	procedure Genere_Code(A: in Arbre; D: in out Dico_Caracteres);
 
@@ -308,19 +312,8 @@ package body Huffman is
 	end Cree_Huffman;
 
 	procedure Huffman_procedure_test is
-		D: Dico_Caracteres;
-		N: Integer;
-
-		H: Arbre_Huffman;
-
-		A : Arbre;
-		queue_arbre : File_Prio := Cree_File(256); -- Il faudrait utiliser un attribut tel que dico'last mais je ne sais pas comment l'utiliser
-
 		nom_fichier : constant String := "Tests/3a_4b_5c_6d_7e.txt";
 		nom_fichier_compress : constant String := "Tests/3a_4b_5c_6d_7e.compress.txt";
-
-		fichier_compress : Ada.Streams.Stream_IO.File_Type;
-		stream_compress : Ada.Streams.Stream_IO.Stream_Access;
 
 		arbre_solution : constant String := 
 			"┬─0─┬─0─                                c:  ( 5 occurrences)" & ASCII.LF &
@@ -336,45 +329,103 @@ package body Huffman is
 			"│   └─1─┬─0─                            a: 011 ( 3 occurrences)" & ASCII.LF &
 			"│   │   └─1─                            b: 111 ( 4 occurrences)" & ASCII.LF ;
 
-		NbCarac : Natural := 0;
 	begin
-		Put_Line("~Lecture du fichier " & Nom_Fichier & " ~");
-		Lire_Fichier(Nom_Fichier, D, N);
-
-		Assert(Get_Occurrence(D, 'a') = 3, "Le nombre de a lu ne correspond pas");
-		Assert(Get_Occurrence(D, 'b') = 4, "Le nombre de b lu ne correspond pas");
-		Assert(Get_Occurrence(D, 'c') = 5, "Le nombre de c lu ne correspond pas");
-		Assert(Get_Occurrence(D, 'd') = 6, "Le nombre de d lu ne correspond pas");
-		Assert(Get_Occurrence(D, 'e') = 7, "Le nombre de e lu ne correspond pas");
-
-		Initialise_Queue_Arbre(queue_arbre, D);
-		A := Genere_Arbre(queue_arbre);
-
-		if To_String(To_Unbounded_String(A,D)) /= arbre_solution then
-			Put("L'arbre généré n'est pas le bon : " & ASCII.LF & ASCII.LF &
-				To_String(To_Unbounded_String(A, D)) & ASCII.LF & ASCII.LF &
-				"Au lieu de : " & ASCII.LF & ASCII.LF &
-				arbre_solution);
-			Assert(false);
-		end if;
-
-		Genere_Code(A, D);
-		if To_String(To_Unbounded_String(A,D)) /= arbre_solution_avec_code then
-			Put("L'arbre généré n'est pas le bon : " & ASCII.LF & ASCII.LF &
-				To_String(To_Unbounded_String(A, D)) & ASCII.LF & ASCII.LF &
-				"Au lieu de : " & ASCII.LF & ASCII.LF &
-				arbre_solution_avec_code);
-			Assert(false);
-		end if;
-
-   		H := new Internal_Huffman'(arb => A, dico => D, nb_char => N);
 		
-		Create(fichier_compress, Out_File, nom_fichier_compress);
-		stream_compress := Stream(fichier_compress);
-		NbCarac := Ecrit_Huffman(H, stream_compress);
-		
-		Put_Line ("Taille avant compression : " & Integer'Image(N) & " et " &
-		          "taille après compression : " & Integer'Image(NbCarac));
+		-- Compression
+		declare
+			NbCarac : Natural := 0;
+			fichier_compress : Ada.Streams.Stream_IO.File_Type;
+			stream_compress : Stream_Access;
+			D: Dico_Caracteres;
+			N: Integer;
+
+			H: Arbre_Huffman;
+
+			A : Arbre;
+			queue_arbre : File_Prio := Cree_File(256); -- Il faudrait utiliser un attribut tel que dico'last mais je ne sais pas comment l'utiliser
+
+		begin
+			Put_Line("~Test de compression du fichier " & Nom_Fichier & " ~");
+			Lire_Fichier(Nom_Fichier, D, N);
+
+			Assert(Get_Occurrence(D, 'a') = 3, "Le nombre de a lu ne correspond pas");
+			Assert(Get_Occurrence(D, 'b') = 4, "Le nombre de b lu ne correspond pas");
+			Assert(Get_Occurrence(D, 'c') = 5, "Le nombre de c lu ne correspond pas");
+			Assert(Get_Occurrence(D, 'd') = 6, "Le nombre de d lu ne correspond pas");
+			Assert(Get_Occurrence(D, 'e') = 7, "Le nombre de e lu ne correspond pas");
+
+			Initialise_Queue_Arbre(queue_arbre, D);
+			A := Genere_Arbre(queue_arbre);
+
+			if To_String(To_Unbounded_String(A,D)) /= arbre_solution then
+				Put("L'arbre généré n'est pas le bon : " & ASCII.LF & ASCII.LF &
+					To_String(To_Unbounded_String(A, D)) & ASCII.LF & ASCII.LF &
+					"Au lieu de : " & ASCII.LF & ASCII.LF &
+					arbre_solution);
+				Assert(false);
+			end if;
+
+			Genere_Code(A, D);
+			if To_String(To_Unbounded_String(A,D)) /= arbre_solution_avec_code then
+				Put("L'arbre généré n'est pas le bon : " & ASCII.LF & ASCII.LF &
+					To_String(To_Unbounded_String(A, D)) & ASCII.LF & ASCII.LF &
+					"Au lieu de : " & ASCII.LF & ASCII.LF &
+					arbre_solution_avec_code);
+				Assert(false);
+			end if;
+
+			H := new Internal_Huffman'(arb => A, dico => D, nb_char => N);
+			
+			Create(fichier_compress, Out_File, nom_fichier_compress);
+			stream_compress := Stream(fichier_compress);
+			NbCarac := Ecrit_Huffman(H, stream_compress);
+			Close(fichier_compress);
+			
+			Put_Line ("Taille avant compression : " & Integer'Image(N) & " et " &
+					  "taille après compression : " & Integer'Image(NbCarac));
+		end;
+
+		New_Line;
+
+		-- Decompression
+		declare
+			NbCarac : Natural := 0;
+			fichier_decompress : Ada.Streams.Stream_IO.File_Type;
+			stream_decompress : Stream_Access;
+			D: Dico_Caracteres;
+			N: Integer;
+
+			H: Arbre_Huffman;
+
+			A : Arbre;
+			queue_arbre : File_Prio := Cree_File(256); -- Il faudrait utiliser un attribut tel que dico'last mais je ne sais pas comment l'utiliser
+		begin
+			Put_Line("~Test de decompression du fichier " & nom_fichier_compress & " ~");
+
+			-- Lecture de l'en-tête
+			Open(fichier_decompress, In_File, nom_fichier_compress);
+			stream_decompress := Stream(fichier_decompress);
+			D := Lit_EnTete(stream_decompress);
+			Close(fichier_decompress);
+
+			-- Récupération de l'arbre de Huffman
+			Initialise_Queue_Arbre(queue_arbre, D);
+			A := Genere_Arbre(queue_arbre);
+			Genere_Code(A, D);
+			-- On s'assure que le code généré à partir de l'entête est bien celui utilisé lors de la compression.
+			if To_String(To_Unbounded_String(A,D)) /= arbre_solution_avec_code then
+				Put("L'arbre généré n'est pas le bon : " & ASCII.LF & ASCII.LF &
+					To_String(To_Unbounded_String(A, D)) & ASCII.LF & ASCII.LF &
+					"Au lieu de : " & ASCII.LF & ASCII.LF &
+					arbre_solution_avec_code);
+				Assert(false);
+			end if;
+
+
+			H := new Internal_Huffman'(arb => A, dico => D, nb_char => N);
+		end;
+
+		-----------------------------------------------------------------------------
 
 		Put_Line("~Les tests de l'arbre de huffman se sont bien passés ... OK~");
 		New_Line;
@@ -385,17 +436,19 @@ package body Huffman is
 	begin
 		for C in Character'Range loop
 			if Est_Present(C, H.dico) then
-				declare
-					image : constant String := Integer'Image(Longueur(Get_Code(C, H.dico)));
-					size_image : constant String := image(image'First + 1 .. image'last);
-				begin
-					Character'Output(stream, C);
-					String'Output(stream, size_image);
-					Character'Output(stream, ASCII.LF);
-					NbOctets := NbOctets + 2*Character'Size + Integer'Size;
-				end;
+				Character'Output(stream, C);
+				Integer'Output(stream, Get_Occurrence(H.dico, C));
+				NbOctets := NbOctets + Character'Size + Integer'Size;
 			end if;
 		end loop;
+
+		declare
+		begin
+			Character'Output(stream, FIN_EN_TETE_1);
+			Integer'Output(stream, FIN_EN_TETE_2);
+			NbOctets := NbOctets + Character'Size + Integer'Size;
+		end;
+
 		return NbOctets;
 	end Ecrit_EnTete;
 
@@ -427,12 +480,31 @@ package body Huffman is
 		return NbOctets;
 	end Ecrit_Huffman;
 
+	function Lit_EnTete(stream : in Stream_Access) return Dico_Caracteres is
+		I : Integer;
+		C : Character;
+		A : Arbre;
+		D : Dico_Caracteres := Cree_Dico;
+	begin
+		-- On Récupère l'en-tête du fichier compressé
+		loop
+			C := Character'Input(stream);
+			I := Integer'Input(stream);
+			exit when C = FIN_EN_TETE_1 and I = FIN_EN_TETE_2;
+			Set_Occurrence(D, C, I);
+			New_Line;
+		end loop;
+
+		return D;
+	end Lit_EnTete;
 
 	-- Lit un arbre stocke dans un flux ouvert en lecture
 	-- Le format de stockage est celui decrit dans le sujet
-	function Lit_Huffman(Flux : Ada.Streams.Stream_IO.Stream_Access) return Arbre_Huffman is
+	function Lit_Huffman(flux : Stream_Access) return Arbre_Huffman is
 		H: Arbre_Huffman;
+		D: Dico_Caracteres;
 	begin
+		D:= Lit_EnTete(flux);
 		-- STUB
 		return H;
 	end Lit_Huffman;
