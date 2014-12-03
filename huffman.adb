@@ -61,6 +61,7 @@ package body Huffman is
 	function Genere_Arbre(queue_arbre : File_Prio) return Arbre;
 	procedure Initialise_Queue_Arbre(queue_arbre : in out File_Prio;
 				D : in Dico_Caracteres);
+	function Ecrit_EnTete(H : Arbre_Huffman; stream : Stream_Access) return Natural;
 
 --------------------------------------------------------------------------------
 
@@ -368,9 +369,36 @@ package body Huffman is
 
    		H := new Internal_Huffman'(arb => A, dico => D, nb_char => N);
 		
+		Create(fichier_compress, Out_File, nom_fichier_compress);
+		stream_compress := Stream(fichier_compress);
+		NbCarac := Ecrit_Huffman(H, stream_compress);
+		
+		Put_Line ("Taille avant compression : " & Integer'Image(N) & " et " &
+		          "taille après compression : " & Integer'Image(NbCarac));
+
 		Put_Line("~Les tests de l'arbre de huffman se sont bien passés ... OK~");
 		New_Line;
 	end Huffman_procedure_test;
+
+	function Ecrit_EnTete(H : Arbre_Huffman; stream : Stream_Access) return Natural is
+		NbOctets: Natural := 0;
+	begin
+		for C in Character'Range loop
+			if Est_Present(C, H.dico) then
+				declare
+					image : constant String := Integer'Image(Longueur(Get_Code(C, H.dico)));
+					size_image : constant String := image(image'First + 1 .. image'last);
+				begin
+					Character'Output(stream, C);
+					String'Output(stream, size_image);
+					Character'Output(stream, ASCII.LF);
+					NbOctets := NbOctets + 2*Character'Size + Integer'Size;
+				end;
+			end if;
+		end loop;
+		return NbOctets;
+	end Ecrit_EnTete;
+
 
 	-- Stocke un arbre dans un flux ouvert en ecriture
 	-- Le format de stockage est celui decrit dans le sujet
@@ -384,13 +412,7 @@ package body Huffman is
 		Create(Fichier, Out_File, Nom_Fichier);
 		--stream := Stream(Fichier);
 		Put_Line("~Stockage de l'arbre en cours~");
-
-		for C in 0..128 loop
--- 			Check number of Occurrences ?
-			Character'Output(stream, Character'Val(C));
--- 			Longueur du code binaire correspondant au caractère -> Dico ?
-			NbOctets := NbOctets + 1;
-		end loop;
+		NbOctets := NbOctets + Ecrit_EnTete(H, stream);
 
 		Put_Line("~Ecriture en cours~");
 
