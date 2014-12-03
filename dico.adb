@@ -25,6 +25,7 @@ package body Dico is
 	procedure Libere(D : in out Dico_Caracteres) is
 	begin
 		Free(D);
+        D := null;
 	end Libere;
 
 	-- Affiche pour chaque caractere: son nombre d'occurences et son code
