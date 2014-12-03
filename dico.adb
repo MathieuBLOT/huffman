@@ -54,6 +54,11 @@ package body Dico is
 		D.T(C).Occurrence := D.T(C).Occurrence +1;
 	end New_Occurrence;
 
+	procedure Set_Occurrence(D : in Dico_Caracteres; C : Character; nb_occur : Integer) is
+	begin
+		D.T(C).Occurrence := nb_occur;
+	end Set_Occurrence;
+
 	-- Associe un code a un caractere
 	procedure Set_Code(C : in Character; Code : in Code_Binaire; D : in out Dico_Caracteres) is
 	begin

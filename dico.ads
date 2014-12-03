@@ -36,6 +36,9 @@ package Dico is
 	-- Nouvelle occurence d'un caractere
 	procedure New_Occurrence(D : in Dico_Caracteres; C : Character);
 
+	-- Nouvelle occurence d'un caractere
+	procedure Set_Occurrence(D : in Dico_Caracteres; C : Character; nb_occur : Integer);
+
 	-- Associe un code a un caractere
 	procedure Set_Code(C : in Character; Code : in Code_Binaire;
 	                    D : in out Dico_Caracteres);
