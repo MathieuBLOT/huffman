@@ -7,7 +7,7 @@ package body Dico is
 	type Tab is array (Character range <>) of Info_Caractere;
 
 	type Dico_Caracteres_Interne is record
-		Number: Integer;	-- Number of different characters
+		Number: Natural;	-- Number of different characters
 		T: Tab(Character'Val(0)..Character'Val(255));
 	end record;
 
@@ -17,6 +17,7 @@ package body Dico is
 	function Cree_Dico return Dico_Caracteres is
 		D: constant Dico_Caracteres := new Dico_Caracteres_Interne;
 	begin
+		D.Number := 0;
 		return D;
 	end Cree_Dico;
 
@@ -51,6 +52,9 @@ package body Dico is
 	-- Nouvelle occurence d'un caractere
 	procedure New_Occurrence(D : in Dico_Caracteres; C : Character) is
 	begin
+		if D.T(C).Occurrence = 0 then
+			D.Number := D.Number + 1;
+		end if;
 		D.T(C).Occurrence := D.T(C).Occurrence +1;
 	end New_Occurrence;
 
@@ -112,7 +116,7 @@ package body Dico is
 	function Nb_Caracteres_Differents(D : in Dico_Caracteres) return Natural is
 
 	begin
-        return 0; -- fix
+        return D.Number;
 	end Nb_Caracteres_Differents;
 
 	-- Retourne le nombre total de caracteres
