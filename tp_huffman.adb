@@ -18,15 +18,20 @@ procedure tp_huffman is
 	procedure Compresse(Nom_Fichier_In, Nom_Fichier_Out : in String) is
 		H : Arbre_Huffman;
 		Nb_Octets_Ecrits : Natural := 0;
-		S : Stream_Access;
+
+		S_In : Stream_Access;
+		Fichier_In: Ada.Streams.Stream_IO.File_Type;
+		S_Out : Stream_Access;
 		Fichier_Out: Ada.Streams.Stream_IO.File_Type;
 	begin
+		Create(Fichier_In, In_File, Nom_Fichier_In);
+		S_In := Stream(Fichier_In);
 		Create(Fichier_Out, Out_File, Nom_Fichier_Out);
-		S := Stream(Fichier_Out);
+		S_Out := Stream(Fichier_Out);
 
-		H := Cree_Huffman(Nom_Fichier_In);
+		H := Cree_Huffman(Fichier_In);
 
-		Nb_Octets_Ecrits := Ecrit_Huffman(H, S);
+		Nb_Octets_Ecrits := Ecrit_Huffman(H, S_Out);
 
 		Put_Line("# " & Natural'Image(Nb_Octets_Ecrits) & " octets ont été écrits en entête (Huffman Tree) #");
 	end Compresse;
