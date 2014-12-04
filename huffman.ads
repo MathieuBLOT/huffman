@@ -19,8 +19,7 @@ package Huffman is
 	-- Cette function lit le fichier et compte le nb d'occurences des
 	-- differents caracteres presents, puis genere l'arbre correspondant
 	-- et le retourne.
-	function Cree_Huffman(Nom_Fichier : in String)
-		return Arbre_Huffman;
+	function Cree_Huffman(original_stream : Stream_Access) return Arbre_Huffman;
 
 	-- Stocke un arbre dans un flux ouvert en ecriture
 	-- Le format de stockage est celui decrit dans le sujet

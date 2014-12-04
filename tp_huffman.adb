@@ -107,7 +107,7 @@ procedure tp_huffman is
 		Create(Fichier_Out, Out_File, Nom_Fichier_Out);
 		S_Out := Stream(Fichier_Out);
 
-		H := Lit_Huffman(S_In);
+		H := Lit_Huffman(S_In, S_Out);
 -- 		Tree := H.A;
 
 		-- On génère une liste de bits (tout le ficier)
