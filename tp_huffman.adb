@@ -21,6 +21,7 @@ procedure tp_huffman is
 		D : Dico_Caracteres := Cree_Dico;
 		Nb_Octets_Ecrits : Natural := 0;
 
+		C : Character;
 		Code_Tmp : Code_Binaire := Cree_Code;	-- Code de chaque caractere
 -- 		Lengths : Length_Buffer;
 -- 		Nb_Codes : Integer := 0;
@@ -40,10 +41,10 @@ procedure tp_huffman is
 		Create(Fichier_Out, Out_File, Nom_Fichier_Out);
 		S_Out := Stream(Fichier_Out);
 
-		H := Cree_Huffman(Fichier_In);
-		D = Genere_Dictionnaire(H);
+		H := Cree_Huffman(Nom_Fichier_In);
+-- 		D = Genere_Dictionnaire(H);
 
-		Nb_Octets_Ecrits := Ecrit_Huffman(H, S_Out);
+		Nb_Octets_Ecrits := Ecrit_Huffman(H, S_In, S_Out);
 
 		Put_Line("# " & Natural'Image(Nb_Octets_Ecrits) & " octets ont été écrits en entête (Huffman Tree) #");
 
@@ -107,7 +108,7 @@ procedure tp_huffman is
 		S_Out := Stream(Fichier_Out);
 
 		H := Lit_Huffman(S_In);
-		Tree := H.A;
+-- 		Tree := H.A;
 
 		-- On génère une liste de bits (tout le ficier)
 		while not End_Of_File(Fichier_In) loop
@@ -130,7 +131,7 @@ procedure tp_huffman is
 			end loop;
 
 			--	On le fait à partir de Tree et non pas H.A au cas où un code est à cheval sur 2 bytes
-			Get_Caractere(It, Tree, Caractere_Trouve, Caractere);
+			Get_Caractere(It, H, Caractere_Trouve, Caractere);
 
 			if Caractere_Trouve then
 				Character'Output(S_Out, Caractere);
