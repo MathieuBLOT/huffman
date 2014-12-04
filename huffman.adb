@@ -1,9 +1,14 @@
-with Ada.Text_IO, Ada.Unchecked_Deallocation, Ada.Assertions, Ada.Characters.Handling;
-use Ada.Text_IO, Ada.Assertions;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Streams.Stream_IO;		use Ada.Streams.Stream_IO;
+with Ada.Text_IO;				use Ada.Text_IO;
+with Ada.Assertions;			use Ada.Assertions;
+with Ada.Integer_Text_Io;		use Ada.Integer_Text_Io;
+with Ada.Strings.Unbounded;		use Ada.Strings.Unbounded;
 with Ada.Unchecked_Conversion;
-with dico, file_priorite;
-use dico;
+with Ada.Unchecked_Deallocation;
+with Ada.Characters.Handling;
+
+with dico;						use dico;
+with file_priorite;
 
 package body Huffman is
 

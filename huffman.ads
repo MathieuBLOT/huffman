@@ -1,7 +1,6 @@
 with Ada.Streams.Stream_IO; use Ada.Streams.Stream_IO;
+with code;                  use code;
 
-with code;
-use code;
 -- paquetage representant un arbre de Huffman de caracteres
 
 package Huffman is
