@@ -464,7 +464,7 @@ package body Huffman is
 
 	procedure Huffman_procedure_test is
 		nom_fichier : constant String := "Tests/3a_4b_5c_6d_7e.txt";
-		nom_fichier_compress : constant String := "Tests/3a_4b_5c_6d_7e.compress.txt";
+		nom_fichier_compress : constant String := "Tests/3a_4b_5c_6d_7e.comp";
 
 		original_file : Ada.Streams.Stream_IO.File_Type;
 		original_stream : Stream_Access;
