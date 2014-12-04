@@ -44,7 +44,7 @@ package Huffman is
 	-- mais que le parcours s'est arrete avant une feuille, alors
 	-- Caractere_Trouve vaut False, Caractere est indetermine
 	-- et A est le dernier noeud atteint.
-	procedure Get_Caractere(It_Code : in Iterateur_Code; A : in out Arbre;
+	procedure Get_Caractere(It_Code : in Iterateur_Code; A : in out Arbre_Huffman;
 					Caractere_Trouve : out Boolean; Caractere : out Character);
 
 private

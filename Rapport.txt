@@ -3,14 +3,20 @@
 Le but de ce TP est de réaliser un programme en Ada de compression-décompression  à  l'aide  de  l'algorithme  du  codage  de Huffman.
 Dans cette optique, il nous a été suggéré d'utiliser 4 modules : code.ads, dico.ads, file_priorite.ads et huffman.ads ; ceux-ci contenant des suggestions de fonctions et procédures à employer pour la réalisation de ce projet. Toutefois, d'autres ont été rajoutées par souci de clarté ou de factorisation.
 
+
+
 		I/ Réalisation des structures de donées du projet
 
 *code.ads :
+	La structure principale est une liste.
+
 	Code_Binaire et Iterateur_Code sont des pointeurs sur leurs homologues homonymes internes :
 		-> Code_Binaire_Interne est une liste chaînée de Bits : cette implémentation a été retenue car la longueur d'un code est inconnu avant sa détermination.
 		-> Iterateur_Code_Interne est un pointeur sur un élément de cette liste (initialement le premier).
 
 *dico.ads :
+	La structure principale est un tableau d'informations indicé selon des caractères.
+
 	Dico_Caracteres est un pointeur sur Dico_Caracteres_Interne.
 	Dico_Caracteres_Interne est un enregistrement contenant :
 		-> Le nombre de différents caractères dans le dictionnaire.
@@ -21,6 +27,8 @@ Dans cette optique, il nous a été suggéré d'utiliser 4 modules : code.ads, d
 		-> Le nombre d'occurrences du caractère.
 
 *file_priorite.ads :
+	La file de priorité est implémentée comme un tas constituée d'un tableau et d'un nombre d'éléments.
+
 	File_Prio est un pointeur sur File_Interne.
 	File_Interne est un enregistrement contenant :
 		-> Le nombre d'éléments dans la  file.
@@ -29,9 +37,9 @@ Dans cette optique, il nous a été suggéré d'utiliser 4 modules : code.ads, d
 		-> Une Donnee (type générique).
 		-> Une Priorite (type générique).
 
-La file de priorité est ainsi implémentée comme un tas constituée d'un tableau et d'un nombre d'éléments.
-
 *huffman.ads :
+	L'arbre de Huffman est implémentée comme un arbre classique.
+
 	Arbre_Huffman est un pointeur sur Internal_Huffman.
 	Internal_Huffman est un enregistrement contenant :
 		-> L'Arbre de Huffman à proprement parler.
@@ -44,6 +52,8 @@ La file de priorité est ainsi implémentée comme un tas constituée d'un table
 
 	Ce module emploie le package file_priorite, en employant les types Arbres et Integer en lieu et place de Donnee et Priorite, ainsi que la fonction "<" pour déteriner la priorité d'un élémet par rapport à un autre.
 	La  majorité des fonctions et procédures ajoutées en plus de celles suggérées sont dans ce package : ainsi, il y a une fonction affichant graphiquement l'arbre, par exemple.
+
+
 
 		II/ Couts des algorithmes principaux
 
@@ -64,6 +74,8 @@ La file de priorité est ainsi implémentée comme un tas constituée d'un table
 	// J'ignore  quelle  est  la complexité  de affiche  - linéaire je  crois, mais je  n'en suis pas  sûr...
 	21:43 -  Grenoble : WTF.
 
+
+
 		III/  Résultats obtenus
 
 Le  développement de ce  projet s'est effectué de manière parllèle : nous avons ainsi codé et testé les packages séparément afin de s'assurer de leur rigidité.
@@ -73,6 +85,8 @@ Ainsi, les fichiers test_code.adb, test_file_priorite.adb et test_huffman vérif
 Un petit arbre de Huffman est généré grâce au fichier Tests/3a_4b_5c_6d_7e.txt.
 
 Nous avons ainsi vérifié que les packages se comportent comme attendus.
+
+
 
 		Conclusion
 
