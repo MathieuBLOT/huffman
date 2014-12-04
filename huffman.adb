@@ -319,8 +319,7 @@ package body Huffman is
 
 	procedure Affiche(H : in Arbre_Huffman) is
 	begin
-		--Put_Line(To_String(To_Unbounded_String(H.arb, H.dico)));
-		null;
+		Put_Line(To_String(To_Unbounded_String(H.arb, H.dico)));
 	end Affiche;
 
 --------------------------------------------------------------------------------
