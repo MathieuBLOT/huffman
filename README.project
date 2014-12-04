@@ -1,0 +1,12 @@
+Le Makefile a été modifié pour offrir des options de développements plus ergonomiques :
+	* all réalise la compilation de exemple_io et tp_huffman tels qu'ils ont été suggérés dans le sujet.
+	* make_tests compile les tests des différents packages.
+	* exe_tests réalise la compilation ci-dessus et éxécutent lesdits tests.
+
+	Les tests sont :
+		* test_code : teste le package code
+		* test_huffman : teste le package huffman
+		* test_file_priorite : teste le package fie_priorite
+
+	* clean nettoie les fichiers de compilation
+	* cleanall a un comportement plus exhaustif que la cible ci-dessus : il ne laisse que les fichiers sources et les fichiers textes originaux à tester.
