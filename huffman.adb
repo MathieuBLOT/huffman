@@ -77,8 +77,10 @@ package body Huffman is
 		type Stream_Buffer is private;
 		function Cree_Stream_Buffer(S : Stream_Access) return Stream_Buffer;
 		function Get_Bit(S : Stream_Buffer) return Code.Bit;
-		procedure Write_Char(S : Stream_Buffer; C : Code_Binaire);
+		procedure Write_Code(S : Stream_Buffer; C : Code_Binaire);
 		function Read_Char(S : Stream_Buffer; A : Arbre) return Character;
+		procedure Write_Last_Byte(S : Stream_Buffer);
+		procedure Libere(S: in out Stream_Buffer);
 	private
 		type Stream_Buffer_Internal;
 		type Stream_Buffer is access Stream_Buffer_Internal;
@@ -107,8 +109,13 @@ package body Huffman is
 
     -----------------------------------------------------------------------------
 
-		procedure Libere is new Ada.Unchecked_Deallocation (Stream_Buffer_Internal,
+		procedure Free is new Ada.Unchecked_Deallocation (Stream_Buffer_Internal,
 						Stream_Buffer);
+		procedure Libere(S: in out Stream_Buffer) is
+		begin
+			Free(S);
+			S := null;
+		end Libere;
 
     -----------------------------------------------------------------------------
 
@@ -135,7 +142,7 @@ package body Huffman is
 
     -----------------------------------------------------------------------------
 
-		procedure Write_Char(S : Stream_Buffer; C : Code_Binaire) is
+		procedure Write_Code(S : Stream_Buffer; C : Code_Binaire) is
 			it : constant Iterateur_Code := Cree_Iterateur(C);
 		begin
 			while Has_Next(it) loop
@@ -147,7 +154,19 @@ package body Huffman is
 					S.bit_courant := S.bit_courant + 1;
 				end if;
 			end loop;
-		end Write_Char;
+		end Write_Code;
+
+     ---------------------------------------------------------------------------
+
+		procedure Write_Last_Byte(S : Stream_Buffer) is
+		begin
+			loop
+				S.O(S.bit_courant) := 0;
+				exit when S.bit_courant = Bit_Number'Last;
+				S.bit_courant := S.bit_courant + 1;
+			end loop;
+			Octet'Output(S.stream, S.O);
+		end Write_Last_Byte;
 
     -----------------------------------------------------------------------------
 
@@ -169,7 +188,11 @@ package body Huffman is
 			end if;
 		end Read_Char;
 
+    -----------------------------------------------------------------------------
+
 	end Stream_Buffer;
+
+	use Stream_Buffer;
 
 --------------------------------------------------------------------------------
 
@@ -579,10 +602,21 @@ package body Huffman is
 
 	function Ecrit_Texte(H : Arbre_Huffman; in_stream, out_stream : Stream_Access) return Natural is
 		NbOctets: Natural := 0;
+		out_buf : Stream_Buffer.Stream_Buffer := Cree_Stream_Buffer(out_stream);
 	begin
-		àc
+		--while not End_Of_File(in_stream) loop
+		begin
+			loop
+				Write_Code(out_buf, Get_Code(Character'Input(in_stream), H.dico));
+				NbOctets := NbOctets + 1; -- normalement il faudrait faire +1 uniquement quand le stream_buffer écrit dans le fichier
+			end loop;
+		--exception
+		end;
+
+		Write_Last_Byte(out_buf);
+		Libere(out_buf);
 		return NbOctets;
-	end
+	end Ecrit_Texte;
 
 --------------------------------------------------------------------------------
 
