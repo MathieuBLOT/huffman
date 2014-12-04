@@ -408,8 +408,8 @@ package body Huffman is
 					Code_FG := C;
 					Code_FD := Cree_Code(C);
 
-					Ajoute_Avant(ZERO, Code_FG);
-					Ajoute_Avant(UN, Code_FD);
+					Ajoute_Apres(ZERO, Code_FG);
+					Ajoute_Apres(UN, Code_FD);
 
 					Internal_Genere_Code(A.FilsG, Code_FG, D);
 					Internal_Genere_Code(A.FilsD, Code_FD, D);
@@ -483,9 +483,9 @@ package body Huffman is
 
 		arbre_solution_avec_code : constant String := 
 			"┬─0─┬─0─                                c: 00 ( 5 occurrences)" & ASCII.LF &
-			"│   └─1─                                d: 10 ( 6 occurrences)" & ASCII.LF &
-			"└─1─┬─0─                                e: 01 ( 7 occurrences)" & ASCII.LF &
-			"│   └─1─┬─0─                            a: 011 ( 3 occurrences)" & ASCII.LF &
+			"│   └─1─                                d: 01 ( 6 occurrences)" & ASCII.LF &
+			"└─1─┬─0─                                e: 10 ( 7 occurrences)" & ASCII.LF &
+			"│   └─1─┬─0─                            a: 110 ( 3 occurrences)" & ASCII.LF &
 			"│   │   └─1─                            b: 111 ( 4 occurrences)" & ASCII.LF ;
 
 	begin
