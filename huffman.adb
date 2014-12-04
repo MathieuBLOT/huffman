@@ -659,7 +659,6 @@ package body Huffman is
 	function Lit_EnTete(in_stream : in Stream_Access) return Dico_Caracteres is
 		I : Integer;
 		C : Character;
-		A : Arbre;
 		D : Dico_Caracteres := Cree_Dico;
 	begin
 		-- On Récupère l'en-tête du fichier compressé
