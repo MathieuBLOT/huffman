@@ -30,7 +30,8 @@ package Huffman is
 	function Ecrit_Huffman(H : in Arbre_Huffman;
 					in_stream, out_stream : in Stream_Access) return Natural;
 
-	-- Lit un arbre stocke dans un flux ouvert en lecture
+	-- Lit un fichier compressé dans un flux in_stream et le décompresse dans 
+    -- out_stream
 	-- Le format de stockage est est le format simple
 	function Lit_Huffman(in_stream, out_stream : Stream_Access) return Arbre_Huffman;
 

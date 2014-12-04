@@ -763,8 +763,9 @@ package body Huffman is
 
 --------------------------------------------------------------------------------
 
-	-- Lit un arbre stocke dans un flux ouvert en lecture
-	-- Le format de stockage est celui decrit dans le sujet
+	-- Lit un fichier compressé dans un flux in_stream et le décompresse dans 
+    -- out_stream
+	-- Le format de stockage est est le format simple
 	function Lit_Huffman(in_stream, out_stream : Stream_Access) return Arbre_Huffman is
 		H: Arbre_Huffman;
 		D: Dico_Caracteres;

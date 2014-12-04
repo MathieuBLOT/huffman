@@ -35,7 +35,7 @@ exe_tests : make_tests
 ################################################################################
 # Programmes
 
-tp_huffman: tp_huffman.adb $(SRC_PACKAGES)
+tp_huffman: tp_huffman.adb $(SRC_PACKAGES) clean
 	gnatmake $(CFLAGS) $@
 
 exemple_io: exemple_io.adb
