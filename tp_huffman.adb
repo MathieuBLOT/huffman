@@ -148,20 +148,28 @@ procedure tp_huffman is
 -- PG PRINCIPAL
 ------------------------------------------------------------------------------
 
-begin
-
-	if (Argument_Count /= 3) then
+    procedure Affiche_Utilisation is
+    begin
 		Put_Line("utilisation:");
 		Put_Line("  compression : ./huffman -c fichier.txt fichier.comp");
 		Put_Line("  decompression : ./huffman -d fichier.comp fichier.comp.txt");
 		Set_Exit_Status(Failure);
-		return;
+    end Affiche_Utilisation;
+
+begin
+
+	if (Argument_Count /= 3) then
+        Affiche_Utilisation;
+        return;
 	end if;
 
-	if (Argument(1) = "-c") then
+	if Argument(1) = "-c" then
 		Compresse(Argument(2), Argument(3));
-	else
+	elsif Argument(1) = "-d" then
 		Decompresse(Argument(2), Argument(3));
+    else
+        Affiche_Utilisation;
+        return;
 	end if;
 
 	Set_Exit_Status(Success);
