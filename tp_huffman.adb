@@ -41,7 +41,7 @@ procedure tp_huffman is
 		Create(Fichier_Out, Out_File, Nom_Fichier_Out);
 		S_Out := Stream(Fichier_Out);
 
-		H := Cree_Huffman(Nom_Fichier_In);
+		H := Cree_Huffman(S_In);
 		D := Get_Dictionnaire(H);
 
 		Nb_Octets_Ecrits := Ecrit_Huffman(H, S_In, S_Out);
@@ -136,11 +136,11 @@ procedure tp_huffman is
 			if Caractere_Trouve then
 				Character'Output(S_Out, Caractere);
 			end if;
-
-			Close(Fichier_In);
-			Close(Fichier_Out);
 		end loop;
 
+
+		Close(Fichier_In);
+		Close(Fichier_Out);
 
 	end Decompresse;
 
