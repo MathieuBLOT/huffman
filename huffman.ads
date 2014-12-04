@@ -51,16 +51,9 @@ package Huffman is
 	-- et A est le dernier noeud atteint.
     --
     -- Actuellement cette fonction n'est pas fonctionnelle il faut utiliser
-    -- Decompresse_Corps_Fichier pour avoir les fonctionnalitées de
-    -- décompression
+    -- Lit_Huffman pour avoir les fonctionnalitées de décompression
 	procedure Get_Caractere(It_Code : in Iterateur_Code; A : in out Arbre_Huffman;
 					Caractere_Trouve : out Boolean; Caractere : out Character);
-
-	-- Décompresse le corps d'un fichier compressé. Le corps du fichier designe
-	-- tout le fichier sauf l'en-tête. Le fichier compressé est le flux in_stream
-	-- et le fichier décompressé obtenu est enregistré dans out_stream.
-	procedure Decompresse_Corps_Fichier(in_stream, out_stream : in Stream_Access;
-				A : Arbre);
 
 private
 

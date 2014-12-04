@@ -81,6 +81,12 @@ package body Huffman is
 	-- Cette file doit contenir tout les caractères avec leur nombre d'occurence.
 	function Genere_Arbre(queue_arbre : File_Prio) return Arbre;
 
+	-- Décompresse le corps d'un fichier compressé. Le corps du fichier designe
+	-- tout le fichier sauf l'en-tête. Le fichier compressé est le flux in_stream
+	-- et le fichier décompressé obtenu est enregistré dans out_stream.
+	procedure Decompresse_Corps_Fichier(in_stream, out_stream : in Stream_Access;
+				A : Arbre);
+
     -----------------------------------------------------------------------------
 
 	-- Ce package encapsule les opérations d'écriture et de lecture d'un
