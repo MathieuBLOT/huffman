@@ -1,13 +1,10 @@
-with Ada.Streams.Stream_IO;		use Ada.Streams.Stream_IO;
 with Ada.Text_IO;				use Ada.Text_IO;
 with Ada.Assertions;			use Ada.Assertions;
-with Ada.Integer_Text_Io;		use Ada.Integer_Text_Io;
 with Ada.Strings.Unbounded;		use Ada.Strings.Unbounded;
 with Ada.Unchecked_Conversion;
 with Ada.Unchecked_Deallocation;
 with Ada.Characters.Handling;
 
-with dico;						use dico;
 with file_priorite;
 
 package body Huffman is
@@ -484,14 +481,9 @@ package body Huffman is
 
 		Put_Line("~Génération de l'arbre de Huffman~");
 		A := Genere_Arbre(queue_arbre);
-		new_Line;
-        Put_Line("~ Affichage de l'abre de Huffman ~");
-		Put_Line(To_String(To_Unbounded_String(A, D)));
-		new_Line;
 
 		Put_Line("~Initialistation des codes de compressions~");
 		Genere_Code(A, D);
-		Affiche(D);
 
    		H := new Internal_Huffman'(arb => A, dico => D, nb_char => N);
         return H;
@@ -581,8 +573,7 @@ package body Huffman is
 			stream_compress := Stream(fichier_compress);
 			NbCarac := Ecrit_Huffman(H, original_stream, stream_compress);
 
-			Put_Line ("Taille avant compression : " & Integer'Image(N) & " et " &
-					  "taille après compression : " & Integer'Image(NbCarac));
+			Put_Line ("Taille avant compression : " & Integer'Image(N));
 			Close(original_file);
 			Close(fichier_compress);
 		end;
@@ -632,6 +623,7 @@ package body Huffman is
 			Initialise_Queue_Arbre(queue_arbre, D);
 			A := Genere_Arbre(queue_arbre);
 			Genere_Code(A, D);
+			-- fix : N devrait contenir le nombre de caractere dans l'arbre
 			H := new Internal_Huffman'(arb => A, dico => D, nb_char => N);
 
 			Decompresse_Corps_Fichier(stream_decompress, stream_apres_decompress, A);
@@ -706,10 +698,7 @@ package body Huffman is
 	-- Retourne le nb d'octets ecrits dans le flux (pour les stats)
 	function Ecrit_Huffman(H : in Arbre_Huffman;
 					in_stream, out_stream : in Stream_Access) return Natural is
-		Fichier : Ada.Streams.Stream_IO.File_Type;
 		NbOctets: Natural := 0;
-		O: Octet;
-        Nom_Fichier : String := ""; -- fix
 	begin
 		Put_Line("~Stockage de l'arbre en cours~");
 		NbOctets := NbOctets + Ecrit_EnTete(H, out_stream);
@@ -718,7 +707,8 @@ package body Huffman is
 
 		NbOctets := NbOctets + Ecrit_Texte(H, in_stream, out_stream);
 
-		Put("fin d'écriture");
+		New_Line;
+		Put_Line("fin d'écriture");
 
 		return NbOctets;
 	end Ecrit_Huffman;
@@ -728,7 +718,7 @@ package body Huffman is
 	function Lit_EnTete(in_stream : in Stream_Access) return Dico_Caracteres is
 		I : Integer;
 		C : Character;
-		D : Dico_Caracteres := Cree_Dico;
+		D : constant Dico_Caracteres := Cree_Dico;
 	begin
 		-- On Récupère l'en-tête du fichier compressé
 		loop
@@ -746,7 +736,7 @@ package body Huffman is
 
 	procedure Decompresse_Corps_Fichier(in_stream, out_stream : in Stream_Access;
 				A : Arbre) is
-		in_buf : Stream_Buffer.Stream_Buffer := Cree_Stream_Buffer(in_stream);
+		in_buf : constant Stream_Buffer.Stream_Buffer := Cree_Stream_Buffer(in_stream);
 		C : Character;
 	begin
 		Put_Line("Decompresse_Corps_Fichier");
@@ -761,6 +751,7 @@ package body Huffman is
 			when Ada.Text_IO.End_Error =>
 				null; -- On a atteint la fin du stream
 		end;
+		New_Line;
 		Put_Line("Fin Decompresse_Corps_Fichier");
 	end Decompresse_Corps_Fichier;
 
@@ -771,11 +762,11 @@ package body Huffman is
 	function Lit_Huffman(in_stream, out_stream : Stream_Access) return Arbre_Huffman is
 		H: Arbre_Huffman;
 		D: Dico_Caracteres;
-		N: Integer;
+		N: Integer := 0; -- fix : devrait contenir le nombre de caractere lu
 		A : Arbre;
 		queue_arbre : File_Prio := Cree_File(256); -- Il faudrait utiliser un attribut tel que dico'last mais je ne sais pas comment l'utiliser
 	begin
-		D:= Lit_EnTete(in_stream);
+		D := Lit_EnTete(in_stream);
 
 		-- Récupération de l'arbre de Huffman
 		Initialise_Queue_Arbre(queue_arbre, D);
