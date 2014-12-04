@@ -69,6 +69,11 @@ La file de priorité est ainsi implémentée comme un tas constituée d'un table
 Le  développement de ce  projet s'est effectué de manière parllèle : nous avons ainsi codé et testé les packages séparément afin de s'assurer de leur rigidité.
 L'affichage graphique des arbres de Huffman s'est avérée extrêmement pratique pour débugger.
 
+Ainsi, les fichiers test_code.adb, test_file_priorite.adb et test_huffman vérifient les packages qui leur sont associés.
+Un petit arbre de Huffman est généré grâce au fichier Tests/3a_4b_5c_6d_7e.txt.
+
+Nous avons ainsi vérifié que les packages se comportent comme attendus.
+
 		Conclusion
 
 Au cours de ce projet, nous avons manipulé simulatanément les principales structures de données rencontrées en programmation ; chaque structure est plus ou moins indiquée suivant la situation, il n'y a pas de structure meilleure dans tous les cas.
