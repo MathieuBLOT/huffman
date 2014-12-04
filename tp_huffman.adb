@@ -36,11 +36,12 @@ procedure tp_huffman is
 		S_Out : Stream_Access;
 		Fichier_Out: Ada.Streams.Stream_IO.File_Type;
 	begin
-		Create(Fichier_In, In_File, Nom_Fichier_In);
+		Open(Fichier_In, In_File, Nom_Fichier_In);
 		S_In := Stream(Fichier_In);
 		Create(Fichier_Out, Out_File, Nom_Fichier_Out);
 		S_Out := Stream(Fichier_Out);
 
+		Put_Line("~Lecture en cours~");
 		H := Cree_Huffman(S_In);
 		D := Get_Dictionnaire(H);
 
@@ -102,15 +103,16 @@ procedure tp_huffman is
 		Code_Seq : Code_Binaire := Cree_Code;
 		It : Iterateur_Code := Cree_Iterateur(Code_Seq);	-- IS supposed to be modified by Get_Caractere
 	begin
-		Create(Fichier_In, In_File, Nom_Fichier_In);
+		Open(Fichier_In, In_File, Nom_Fichier_In);
 		S_In := Stream(Fichier_In);
 		Create(Fichier_Out, Out_File, Nom_Fichier_Out);
 		S_Out := Stream(Fichier_Out);
 
-		H := Lit_Huffman(S_In, S_Out);
+		H := Lit_Huffman(S_In);
 -- 		Tree := H.A;
 
-		-- On génère une liste de bits (tout le ficier)
+		-- On génère une liste de bits (tout le fichier)
+		Put_Line("~On décode~");
 		while not End_Of_File(Fichier_In) loop
 			O := Octet'Input(S_In);	-- On récupère un octet
 			Code_Tmp(7) := Integer(O)/128;
@@ -137,6 +139,8 @@ procedure tp_huffman is
 				Character'Output(S_Out, Caractere);
 			end if;
 		end loop;
+
+		Put_Line("~Décompression terminée~");
 
 
 		Close(Fichier_In);
