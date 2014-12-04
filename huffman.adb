@@ -46,6 +46,8 @@ package body Huffman is
 	function Lit_EnTete(in_stream : in Stream_Access) return Dico_Caracteres;
 
 	procedure Genere_Code(A: in Arbre; D: in out Dico_Caracteres);
+	procedure Decompresse_Corps_Fichier(in_stream, out_stream : in Stream_Access;
+				A : Arbre);
 
 	-- Retourne un dictionnaire contenant les caracteres presents
 	-- dans l'arbre et leur code binaire (evite les parcours multiples)
@@ -672,6 +674,28 @@ package body Huffman is
 
 		return D;
 	end Lit_EnTete;
+
+--------------------------------------------------------------------------------
+
+	procedure Decompresse_Corps_Fichier(in_stream, out_stream : in Stream_Access;
+				A : Arbre) is
+		in_buf : Stream_Buffer.Stream_Buffer := Cree_Stream_Buffer(in_stream);
+		C : Character;
+	begin
+		--while not End_Of_File(in_stream) loop
+		begin
+			loop
+				C := Read_Char(in_buf, A);
+				Put(c);
+				Character'Output(out_stream, C);
+			end loop;
+		exception
+			when Ada.Text_IO.End_Error =>
+				null; -- On a atteint la fin du stream
+		end;
+
+		Libere(in_buf);
+	end Decompresse_Corps_Fichier;
 
 --------------------------------------------------------------------------------
 
