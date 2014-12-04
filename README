@@ -1,16 +1,14 @@
+Le Makefile a été modifié pour offrir des options de développements plus ergonomiques :
+	* all réalise la compilation de exemple_io et tp_huffman tels qu'ils ont été suggérés dans le sujet.
+	* make_tests compile les tests des différents packages.
+	* exe_tests réalise la compilation ci-dessus et éxécutent lesdits tests.
 
-* Les packages proposés (*.ads) le sont a titre INDICATIF.
-Vous pouvez les modifier (packages, spécifications des procédures, ...)
-a volonté selon vos besoins, ou ne pas les utiliser du tout!
+	Les tests sont :
+		* test_code : teste le package code
+		* test_huffman : teste le package huffman
+		* test_file_priorite : teste le package fie_priorite
 
-* Un Makefile est fourni (qui ne fonctionnera qu'une fois les .adb écrits).
-A modifier si vous rajoutez des fichiers dans votre projet.
+	* clean nettoie les fichiers de compilation
+	* cleanall a un comportement plus exhaustif que la cible ci-dessus : il ne laisse que les fichiers sources et les fichiers textes originaux à tester.
 
-* exemple_io.adb donne une méthode pour faire des lectures/écritures dans
-des fichiers en Ada
-
-* Le repertoire Tests contient quelques fichiers test et un script qui lance
-la compression d'un fichier, le décompresse, et compare le résultat avec le
-fichier initial.
-A vous de compléter ces tests avec vos propres fichiers.
-
+Remarque : le nombre total d'octets écrits dans le fichier compressé (retourné par une fonction) est incorrect.
