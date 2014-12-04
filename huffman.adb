@@ -41,9 +41,9 @@ package body Huffman is
 
 	-- Lit un arbre stocke dans un flux ouvert en lecture
 	-- Le format de stockage est celui decrit dans le sujet
-	procedure Lire_Fichier(Nom_Fichier : in String; D : out Dico_Caracteres;
+	procedure Extrait_Dico(in_stream : in Stream_Access; D : out Dico_Caracteres;
 				N : out Integer);
-	function Lit_EnTete(stream : in Stream_Access) return Dico_Caracteres;
+	function Lit_EnTete(in_stream : in Stream_Access) return Dico_Caracteres;
 
 	procedure Genere_Code(A: in Arbre; D: in out Dico_Caracteres);
 
@@ -318,30 +318,29 @@ package body Huffman is
 
 --------------------------------------------------------------------------------
 
-	procedure Lire_Fichier(Nom_Fichier : in String; D : out Dico_Caracteres;
+	procedure Extrait_Dico(in_stream : in Stream_Access; D : out Dico_Caracteres;
 				N : out Integer) is
-		Fichier : Ada.Streams.Stream_IO.File_Type;
-		Flux : Ada.Streams.Stream_IO.Stream_Access;
-		C: Character;
+		C, Cnext: Character;
 	begin
 		D := Cree_Dico;
-		Open(Fichier, In_File, Nom_Fichier);
-		Flux := Stream(Fichier);
 		N := 0;
 
-		Assert( not End_Of_File(Fichier), "Le fichier " & nom_fichier & " semble vide");
-
 		-- lecture tant qu'il reste des caracteres
-		loop
-			C := Character'Val(Octet'Input(Flux));
-			exit when End_Of_File(Fichier);
+		Cnext := Character'Val(Octet'Input(in_stream));
+		begin
+			loop
+				C := Cnext;
+				Cnext := Character'Val(Octet'Input(in_stream));
 
-			New_Occurrence(D, C);
-			N := N + 1;
-		end loop;
+				New_Occurrence(D, C);
+				N := N + 1;
+			end loop;
+		exception 
+			when Ada.Streams.Stream_IO.End_Error =>
+				null; -- On a atteint la fin du stream
+		end;
 
-		Close(Fichier);
-	end Lire_Fichier;
+	end Extrait_Dico;
 
 --------------------------------------------------------------------------------
 
@@ -428,12 +427,17 @@ package body Huffman is
 
 		H: Arbre_Huffman;
 
+		original_file : Ada.Streams.Stream_IO.File_Type;
+		original_stream : Stream_Access;
+
 		A : Arbre;
 		queue_arbre : File_Prio := Cree_File(256); -- Il faudrait utiliser un attribut tel que dico'last mais je ne sais pas comment l'utiliser
 
 	begin
 		Put_Line("~Lecture du fichier " & Nom_Fichier & " ~");
-		Lire_Fichier(Nom_Fichier, D, N);
+		Open(original_file, In_File, Nom_Fichier);
+		original_stream := Stream(original_file);
+		Extrait_Dico(original_stream, D, N);
 
 		Put_Line("~Initialisation de la file de priorite~");
 		Initialise_Queue_Arbre(queue_arbre, D);
@@ -450,6 +454,7 @@ package body Huffman is
 		Affiche(D);
 
    		H := new Internal_Huffman'(arb => A, dico => D, nb_char => N);
+		Close(original_file);
         return H;
 	end Cree_Huffman;
 
@@ -458,6 +463,9 @@ package body Huffman is
 	procedure Huffman_procedure_test is
 		nom_fichier : constant String := "Tests/3a_4b_5c_6d_7e.txt";
 		nom_fichier_compress : constant String := "Tests/3a_4b_5c_6d_7e.compress.txt";
+
+		original_file : Ada.Streams.Stream_IO.File_Type;
+		original_stream : Stream_Access;
 
 		arbre_solution : constant String := 
 			"┬─0─┬─0─                                c:  ( 5 occurrences)" & ASCII.LF &
@@ -490,7 +498,10 @@ package body Huffman is
 
 		begin
 			Put_Line("~Test de compression du fichier " & Nom_Fichier & " ~");
-			Lire_Fichier(Nom_Fichier, D, N);
+			Open(original_file, In_File, Nom_Fichier);
+			original_stream := Stream(original_file);
+			Extrait_Dico(original_stream, D, N);
+
 
 			Assert(Get_Occurrence(D, 'a') = 3, "Le nombre de a lu ne correspond pas");
 			Assert(Get_Occurrence(D, 'b') = 4, "Le nombre de b lu ne correspond pas");
@@ -522,11 +533,12 @@ package body Huffman is
 			
 			Create(fichier_compress, Out_File, nom_fichier_compress);
 			stream_compress := Stream(fichier_compress);
-			NbCarac := Ecrit_Huffman(H, stream_compress);
-			Close(fichier_compress);
+			NbCarac := Ecrit_Huffman(H, original_stream, stream_compress);
 			
 			Put_Line ("Taille avant compression : " & Integer'Image(N) & " et " &
 					  "taille après compression : " & Integer'Image(NbCarac));
+			Close(original_file);
+			Close(fichier_compress);
 		end;
 
 		New_Line;
@@ -550,7 +562,6 @@ package body Huffman is
 			Open(fichier_decompress, In_File, nom_fichier_compress);
 			stream_decompress := Stream(fichier_decompress);
 			D := Lit_EnTete(stream_decompress);
-			Close(fichier_decompress);
 
 			-- Récupération de l'arbre de Huffman
 			Initialise_Queue_Arbre(queue_arbre, D);
@@ -567,6 +578,7 @@ package body Huffman is
 
 
 			H := new Internal_Huffman'(arb => A, dico => D, nb_char => N);
+			Close(fichier_decompress);
 		end;
 
 		-----------------------------------------------------------------------------
@@ -610,7 +622,9 @@ package body Huffman is
 				Write_Code(out_buf, Get_Code(Character'Input(in_stream), H.dico));
 				NbOctets := NbOctets + 1; -- normalement il faudrait faire +1 uniquement quand le stream_buffer écrit dans le fichier
 			end loop;
-		--exception
+		exception
+			when Ada.Text_IO.End_Error =>
+				null; -- On a atteint la fin du stream
 		end;
 
 		Write_Last_Byte(out_buf);
@@ -623,34 +637,26 @@ package body Huffman is
 	-- Stocke un arbre dans un flux ouvert en ecriture
 	-- Le format de stockage est celui decrit dans le sujet
 	-- Retourne le nb d'octets ecrits dans le flux (pour les stats)
-	function Ecrit_Huffman(H : in Arbre_Huffman; stream : Stream_Access) return Natural is
+	function Ecrit_Huffman(H : in Arbre_Huffman;
+					in_stream, out_stream : in Stream_Access) return Natural is
 		Fichier : Ada.Streams.Stream_IO.File_Type;
 		NbOctets: Natural := 0;
 		O: Octet;
         Nom_Fichier : String := ""; -- fix
 	begin
-		Create(Fichier, Out_File, Nom_Fichier);
-		--stream := Stream(Fichier);
 		Put_Line("~Stockage de l'arbre en cours~");
-		NbOctets := NbOctets + Ecrit_EnTete(H, stream);
+		NbOctets := NbOctets + Ecrit_EnTete(H, out_stream);
 
 		Put_Line("~Ecriture en cours~");
 
-		--NbOctets := NbOctets + Ecrit_Texte(H, in_stream, out_stream);
-		--Integer'Output(stream, I1);
-		Octet'Output(stream, O);
-		Character'Output(stream, 'a');
-		Character'Output(stream, 'b');
-		Character'Output(stream, 'c');
-
-		Close(Fichier);
+		NbOctets := NbOctets + Ecrit_Texte(H, in_stream, out_stream);
 
 		return NbOctets;
 	end Ecrit_Huffman;
 
 --------------------------------------------------------------------------------
 
-	function Lit_EnTete(stream : in Stream_Access) return Dico_Caracteres is
+	function Lit_EnTete(in_stream : in Stream_Access) return Dico_Caracteres is
 		I : Integer;
 		C : Character;
 		A : Arbre;
@@ -658,8 +664,8 @@ package body Huffman is
 	begin
 		-- On Récupère l'en-tête du fichier compressé
 		loop
-			C := Character'Input(stream);
-			I := Integer'Input(stream);
+			C := Character'Input(in_stream);
+			I := Integer'Input(in_stream);
 			exit when C = FIN_EN_TETE_1 and I = FIN_EN_TETE_2;
 			Set_Occurrence(D, C, I);
 			New_Line;

@@ -26,7 +26,8 @@ package Huffman is
 	-- Stocke un arbre dans un flux ouvert en ecriture
 	-- Le format de stockage est celui decrit dans le sujet
 	-- Retourne le nb d'octets ecrits dans le flux (pour les stats)
-	function Ecrit_Huffman(H : in Arbre_Huffman; stream : Stream_Access) return Natural;
+	function Ecrit_Huffman(H : in Arbre_Huffman;
+					in_stream, out_stream : in Stream_Access) return Natural;
 
 	-- Lit un arbre stocke dans un flux ouvert en lecture
 	-- Le format de stockage est celui decrit dans le sujet
