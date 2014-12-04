@@ -12,6 +12,7 @@ package Huffman is
 	-- garantit: en sortie toute la memoire a ete libere, et A = null.
 	procedure Libere(H : in out Arbre_Huffman);
 
+    -- Affiche l'arbre de Huffman sous forme textuelle
 	procedure Affiche(H : in Arbre_Huffman);
 
 
@@ -24,15 +25,19 @@ package Huffman is
 	-- Stocke un arbre dans un flux ouvert en ecriture
 	-- Le format de stockage est celui decrit dans le sujet
 	-- Retourne le nb d'octets ecrits dans le flux (pour les stats)
+    --
+    -- note : le nb d'octets est actuellement largement sur-estimé
 	function Ecrit_Huffman(H : in Arbre_Huffman;
 					in_stream, out_stream : in Stream_Access) return Natural;
 
 	-- Lit un arbre stocke dans un flux ouvert en lecture
-	-- Le format de stockage est celui decrit dans le sujet
+	-- Le format de stockage est est le format simple
 	function Lit_Huffman(in_stream, out_stream : Stream_Access) return Arbre_Huffman;
 
+    -- Procedure de test permettant de valider le fonctionnement de l'arbre d'huffman
 	procedure Huffman_procedure_test;
 
+    -- permet de récupérer le dictionnaire généré par l'arbre de huffman
 	function Get_Dictionnaire(H : Arbre_Huffman) return Dico_Caracteres;
 
 	------ Parcours de l'arbre (decodage)
@@ -44,8 +49,18 @@ package Huffman is
 	-- mais que le parcours s'est arrete avant une feuille, alors
 	-- Caractere_Trouve vaut False, Caractere est indetermine
 	-- et A est le dernier noeud atteint.
+    --
+    -- Actuellement cette fonction n'est pas fonctionnelle il faut utiliser
+    -- Decompresse_Corps_Fichier pour avoir les fonctionnalitées de
+    -- décompression
 	procedure Get_Caractere(It_Code : in Iterateur_Code; A : in out Arbre_Huffman;
 					Caractere_Trouve : out Boolean; Caractere : out Character);
+
+	-- Décompresse le corps d'un fichier compressé. Le corps du fichier designe
+	-- tout le fichier sauf l'en-tête. Le fichier compressé est le flux in_stream
+	-- et le fichier décompressé obtenu est enregistré dans out_stream.
+	procedure Decompresse_Corps_Fichier(in_stream, out_stream : in Stream_Access;
+				A : Arbre);
 
 private
 
