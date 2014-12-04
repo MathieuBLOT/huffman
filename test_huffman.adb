@@ -78,12 +78,18 @@ procedure Test_huffman is
     flux : Ada.Streams.Stream_IO.Stream_Access;
 
     nom_fichier : String := "Tests/mini.txt";
+    original_file : Ada.Streams.Stream_IO.File_Type;
+    original_stream : Stream_Access;
+
 begin
     New_line;
 
 
     -- compression
-    huff := Cree_Huffman(nom_fichier);
+    Open(original_file, In_File, Nom_Fichier);
+    original_stream := Stream(original_file);
+
+    huff := Cree_Huffman(original_stream);
     Affiche(huff);
 
     New_line;
@@ -116,6 +122,8 @@ begin
 --    code := GenerateCode(dico);
 --
 --    Assert(Same(code, solution), "Erreur lors de la generation du code binaire");
+
+    Close(original_file);
 
     Put_Line("###########################################################################");
     Put_Line("# Les tests concernant le module Huffman se sont tous bien passé ! ... OK #");

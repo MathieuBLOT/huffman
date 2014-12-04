@@ -427,23 +427,17 @@ package body Huffman is
 	-- Cette function lit le fichier et compte le nb d'occurences des
 	-- differents caracteres presents, puis genere l'arbre correspondant
 	-- et le retourne.
-	function Cree_Huffman(Nom_Fichier : in String) return Arbre_Huffman is
+	function Cree_Huffman(original_stream : Stream_Access) return Arbre_Huffman is
 
 		D: Dico_Caracteres;
 		N: Integer;
 
 		H: Arbre_Huffman;
 
-		original_file : Ada.Streams.Stream_IO.File_Type;
-		original_stream : Stream_Access;
-
 		A : Arbre;
 		queue_arbre : File_Prio := Cree_File(256); -- Il faudrait utiliser un attribut tel que dico'last mais je ne sais pas comment l'utiliser
 
 	begin
-		Put_Line("~Lecture du fichier " & Nom_Fichier & " ~");
-		Open(original_file, In_File, Nom_Fichier);
-		original_stream := Stream(original_file);
 		Extrait_Dico(original_stream, D, N);
 
 		Put_Line("~Initialisation de la file de priorite~");
@@ -461,7 +455,6 @@ package body Huffman is
 		Affiche(D);
 
    		H := new Internal_Huffman'(arb => A, dico => D, nb_char => N);
-		Close(original_file);
         return H;
 	end Cree_Huffman;
 
