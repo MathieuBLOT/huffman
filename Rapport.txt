@@ -53,6 +53,9 @@ Dans cette optique, il nous a été suggéré d'utiliser 4 modules : code.ads, d
 	Ce module emploie le package file_priorite, en employant les types Arbres et Integer en lieu et place de Donnee et Priorite, ainsi que la fonction "<" pour déteriner la priorité d'un élémet par rapport à un autre.
 	La  majorité des fonctions et procédures ajoutées en plus de celles suggérées sont dans ce package : ainsi, il y a une fonction affichant graphiquement l'arbre, par exemple.
 
+	*Stream_Buffer :
+		Il s'agit d'un package rajouté au sein de huffman.adb.
+		Ce sub-package s'occupe du traitement dans les flux de données, et donc la lecture et l'écriture de code.
 
 
 		II/ Couts des algorithmes principaux

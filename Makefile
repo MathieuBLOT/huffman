@@ -63,5 +63,5 @@ clean:
 	rm -f b~* ~*
 
 cleanall: clean
-	rm -f $(EXE) $(TESTS) exemple_io.txt *~
+	rm -f $(EXE) $(TESTS) exemple_io.txt ./Tests/*.comp* *~
 

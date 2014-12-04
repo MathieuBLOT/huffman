@@ -27,15 +27,25 @@ begin
 
 
 	Insere(L, 'A', 1);
+	Put_Line("On insère A de priorité 1");
 	Insere(L, 'B', 30);
+	Put_Line("On insère B de priorité 30");
 	Insere(L, 'C', 5);
+	Put_Line("On insère C de priorité 5");
 	Insere(L, 'D', 77);
+	Put_Line("On insère D de priorité 77");
 	Insere(L, 'E', 6);
+	Put_Line("On insère E de priorité 6");
 	Insere(L, 'F', 4);
+	Put_Line("On insère F de priorité 4");
 	Insere(L, 'G', 66);
+	Put_Line("On insère G de priorité 66");
 	Insere(L, 'H', 125);
+	Put_Line("On insère H de priorité 125");
 	Insere(L, 'I', 3);
+	Put_Line("On insère I de priorité 3");
 	Insere(L, 'J', 99);
+	Put_Line("On insère J de priorité 99");
 
 --------------------------------------------------------------------------------
 
