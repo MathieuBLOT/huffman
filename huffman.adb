@@ -76,7 +76,7 @@ package body Huffman is
 	function Genere_Arbre(queue_arbre : File_Prio) return Arbre;
 	procedure Initialise_Queue_Arbre(queue_arbre : in out File_Prio;
 				D : in Dico_Caracteres);
-	function Ecrit_EnTete(H : Arbre_Huffman; stream : Stream_Access) return Natural;
+	function Ecrit_EnTete(H : Arbre_Huffman; stream_out : Stream_Access) return Natural;
 
     -----------------------------------------------------------------------------
 
@@ -596,21 +596,22 @@ package body Huffman is
 
 --------------------------------------------------------------------------------
 
-	function Ecrit_EnTete(H : Arbre_Huffman; stream : Stream_Access) return Natural is
+	function Ecrit_EnTete(H : Arbre_Huffman; stream_out : Stream_Access) return Natural is
 		NbOctets: Natural := 0;
+
 	begin
 		for C in Character'Range loop
 			if Est_Present(C, H.dico) then
-				Character'Output(stream, C);
-				Integer'Output(stream, Get_Occurrence(H.dico, C));
+				Character'Output(stream_out, C);
+				Integer'Output(stream_out, Get_Occurrence(H.dico, C));
 				NbOctets := NbOctets + Character'Size + Integer'Size;
 			end if;
 		end loop;
 
 		declare
 		begin
-			Character'Output(stream, FIN_EN_TETE_1);
-			Integer'Output(stream, FIN_EN_TETE_2);
+			Character'Output(stream_out, FIN_EN_TETE_1);
+			Integer'Output(stream_out, FIN_EN_TETE_2);
 			NbOctets := NbOctets + Character'Size + Integer'Size;
 		end;
 
