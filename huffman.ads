@@ -29,7 +29,7 @@ package Huffman is
 
 	-- Lit un arbre stocke dans un flux ouvert en lecture
 	-- Le format de stockage est celui decrit dans le sujet
-	function Lit_Huffman(Flux : Ada.Streams.Stream_IO.Stream_Access) return Arbre_Huffman;
+	function Lit_Huffman(in_stream, out_stream : Stream_Access) return Arbre_Huffman;
 
 	procedure Huffman_procedure_test;
 
