@@ -171,16 +171,17 @@ package body Huffman is
 
 	procedure Libere(H : in out Arbre_Huffman) is
 	begin
-		null;
-		--if Est_Vide(H.A) then
-			--return;
-		--end if;
+		if Est_Vide(H.arb) then
+			return;
+		end if;
 
-		--Libere(H.A.FilsD);
-		--Libere(H.A.FilsG);
+		Libere(H.arb.FilsD);
+		Libere(H.arb.FilsG);
 
-		--Libere(H.A);
-		--H.A := null;
+		Libere(H.arb);
+		Libere(H.dico);
+
+		H := null;
 	end Libere;
 
     function To_Unbounded_String(A : Arbre; D : Dico_Caracteres) return Unbounded_string is
