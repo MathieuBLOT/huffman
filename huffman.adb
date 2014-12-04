@@ -13,6 +13,8 @@ package body Huffman is
 		"<");
 	use Priority_Queue;
 
+--------------------------------------------------------------------------------
+
 	type Octet is new Integer range 0 .. 255;
 	for Octet'Size use 8; -- permet d'utiliser Octet'Input et Octet'Output,
 	                      -- pour lire/ecrire un octet dans un flux
@@ -31,6 +33,8 @@ package body Huffman is
 
 	FIN_EN_TETE_1 : constant Character := '-';
 	FIN_EN_TETE_2 : constant Integer := -1;
+
+--------------------------------------------------------------------------------
 
 	procedure Libere is new Ada.Unchecked_Deallocation (Noeud, Arbre);
 	function Est_une_Feuille(A : in Arbre) return Boolean;
@@ -66,6 +70,9 @@ package body Huffman is
 	procedure Initialise_Queue_Arbre(queue_arbre : in out File_Prio;
 				D : in Dico_Caracteres);
 	function Ecrit_EnTete(H : Arbre_Huffman; stream : Stream_Access) return Natural;
+
+    -----------------------------------------------------------------------------
+
 	package Stream_Buffer is
 		type Stream_Buffer is private;
 		function Cree_Stream_Buffer(S : Stream_Access) return Stream_Buffer;
@@ -76,6 +83,8 @@ package body Huffman is
 		type Stream_Buffer_Internal;
 		type Stream_Buffer is access Stream_Buffer_Internal;
 	end Stream_Buffer;
+
+    -----------------------------------------------------------------------------
 
 	package body Stream_Buffer is
 		type Bit_Number is range 0 .. 7;
@@ -96,10 +105,12 @@ package body Huffman is
 			stream : Stream_Access := S;
 		end record;
 
-		-----------------------------------------------------------------------------
+    -----------------------------------------------------------------------------
 
 		procedure Libere is new Ada.Unchecked_Deallocation (Stream_Buffer_Internal,
 						Stream_Buffer);
+
+    -----------------------------------------------------------------------------
 
 		function Cree_Stream_Buffer(S : Stream_Access) return Stream_Buffer is
 		begin
@@ -107,6 +118,8 @@ package body Huffman is
 			-- lors du premier appel à Get_Bit
 			return new Stream_Buffer_Internal(S); 
 		end Cree_Stream_Buffer;
+
+    -----------------------------------------------------------------------------
 
 		function Get_Bit(S : Stream_Buffer) return Code.Bit is
 		begin
@@ -119,6 +132,8 @@ package body Huffman is
 
 			return S.o(S.bit_courant);
 		end Get_Bit;
+
+    -----------------------------------------------------------------------------
 
 		procedure Write_Char(S : Stream_Buffer; C : Code_Binaire) is
 			it : constant Iterateur_Code := Cree_Iterateur(C);
@@ -133,6 +148,8 @@ package body Huffman is
 				end if;
 			end loop;
 		end Write_Char;
+
+    -----------------------------------------------------------------------------
 
 		function Read_Char(S : Stream_Buffer; A : Arbre) return Character is
 			child : Arbre;
@@ -154,7 +171,6 @@ package body Huffman is
 
 	end Stream_Buffer;
 
-
 --------------------------------------------------------------------------------
 
 	function Est_une_Feuille(A : in Arbre) return Boolean is
@@ -167,7 +183,7 @@ package body Huffman is
 		return A = null;
 	end Est_Vide;
 
-
+--------------------------------------------------------------------------------
 
 	procedure Libere(H : in out Arbre_Huffman) is
 	begin
@@ -183,6 +199,8 @@ package body Huffman is
 
 		H := null;
 	end Libere;
+
+--------------------------------------------------------------------------------
 
     function To_Unbounded_String(A : Arbre; D : Dico_Caracteres) return Unbounded_string is
 
@@ -267,11 +285,15 @@ package body Huffman is
 		return Child(A, 0);
 	end To_Unbounded_String;
 
+--------------------------------------------------------------------------------
+
 	procedure Affiche(H : in Arbre_Huffman) is
 	begin
 		--Put_Line(To_String(To_Unbounded_String(H.arb, H.dico)));
 		null;
 	end Affiche;
+
+--------------------------------------------------------------------------------
 
 	procedure Lire_Fichier(Nom_Fichier : in String; D : out Dico_Caracteres;
 				N : out Integer) is
@@ -298,6 +320,8 @@ package body Huffman is
 		Close(Fichier);
 	end Lire_Fichier;
 
+--------------------------------------------------------------------------------
+
 	function Genere_Arbre(queue_arbre : File_Prio) return Arbre is
 		prio_g, prio_d : Integer;
 		fg, fd : Arbre;
@@ -316,6 +340,8 @@ package body Huffman is
 		return fg;
 	end Genere_Arbre;
 
+--------------------------------------------------------------------------------
+
 	procedure Initialise_Queue_Arbre(queue_arbre : in out File_Prio;
 				D : in Dico_Caracteres) is
 		nb_occur : Integer;
@@ -333,6 +359,8 @@ package body Huffman is
 			end if;
 		end loop;
 	end Initialise_Queue_Arbre;
+
+--------------------------------------------------------------------------------
 
 	procedure Genere_Code(A: in Arbre; D: in out Dico_Caracteres) is
 	begin
@@ -363,6 +391,8 @@ package body Huffman is
 			Internal_Genere_Code(A, Cree_Code, D);
 		end;
 	end Genere_Code;
+
+--------------------------------------------------------------------------------
 
 	-- Cree un arbre de Huffman a partir d'un fichier texte
 	-- Cette function lit le fichier et compte le nb d'occurences des
@@ -399,6 +429,8 @@ package body Huffman is
    		H := new Internal_Huffman'(arb => A, dico => D, nb_char => N);
         return H;
 	end Cree_Huffman;
+
+--------------------------------------------------------------------------------
 
 	procedure Huffman_procedure_test is
 		nom_fichier : constant String := "Tests/3a_4b_5c_6d_7e.txt";
@@ -520,6 +552,8 @@ package body Huffman is
 		New_Line;
 	end Huffman_procedure_test;
 
+--------------------------------------------------------------------------------
+
 	function Ecrit_EnTete(H : Arbre_Huffman; stream : Stream_Access) return Natural is
 		NbOctets: Natural := 0;
 	begin
@@ -541,6 +575,16 @@ package body Huffman is
 		return NbOctets;
 	end Ecrit_EnTete;
 
+--------------------------------------------------------------------------------
+
+	function Ecrit_Texte(H : Arbre_Huffman; in_stream, out_stream : Stream_Access) return Natural is
+		NbOctets: Natural := 0;
+	begin
+		àc
+		return NbOctets;
+	end
+
+--------------------------------------------------------------------------------
 
 	-- Stocke un arbre dans un flux ouvert en ecriture
 	-- Le format de stockage est celui decrit dans le sujet
@@ -558,6 +602,7 @@ package body Huffman is
 
 		Put_Line("~Ecriture en cours~");
 
+		--NbOctets := NbOctets + Ecrit_Texte(H, in_stream, out_stream);
 		--Integer'Output(stream, I1);
 		Octet'Output(stream, O);
 		Character'Output(stream, 'a');
@@ -568,6 +613,8 @@ package body Huffman is
 
 		return NbOctets;
 	end Ecrit_Huffman;
+
+--------------------------------------------------------------------------------
 
 	function Lit_EnTete(stream : in Stream_Access) return Dico_Caracteres is
 		I : Integer;
@@ -587,6 +634,8 @@ package body Huffman is
 		return D;
 	end Lit_EnTete;
 
+--------------------------------------------------------------------------------
+
 	-- Lit un arbre stocke dans un flux ouvert en lecture
 	-- Le format de stockage est celui decrit dans le sujet
 	function Lit_Huffman(flux : Stream_Access) return Arbre_Huffman is
@@ -598,6 +647,7 @@ package body Huffman is
 		return H;
 	end Lit_Huffman;
 
+--------------------------------------------------------------------------------
 
 ------ Parcours de l'arbre (decodage)
 
