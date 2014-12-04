@@ -168,8 +168,8 @@ package body Huffman is
 		procedure Write_Last_Byte(S : Stream_Buffer) is
 		begin
 			loop
-				S.O(S.bit_courant) := 0;
 				exit when S.bit_courant = Bit_Number'Last;
+				S.O(S.bit_courant) := 0;
 				S.bit_courant := S.bit_courant + 1;
 			end loop;
 			Octet'Output(S.stream, S.O);
@@ -463,6 +463,7 @@ package body Huffman is
 	procedure Huffman_procedure_test is
 		nom_fichier : constant String := "Tests/3a_4b_5c_6d_7e.txt";
 		nom_fichier_compress : constant String := "Tests/3a_4b_5c_6d_7e.comp";
+		nom_fichier_apres_decompress : constant String := "Tests/3a_4b_5c_6d_7e.apres_decompress";
 
 		original_file : Ada.Streams.Stream_IO.File_Type;
 		original_stream : Stream_Access;
@@ -501,6 +502,12 @@ package body Huffman is
 			Open(original_file, In_File, Nom_Fichier);
 			original_stream := Stream(original_file);
 			Extrait_Dico(original_stream, D, N);
+
+			-- On revient au début du fichier (je n'ai pas trouvé la fonction
+			-- seek ou similaire en ADA
+			Close(original_file);
+			Open(original_file, In_File, Nom_Fichier);
+			original_stream := Stream(original_file);
 
 
 			Assert(Get_Occurrence(D, 'a') = 3, "Le nombre de a lu ne correspond pas");
@@ -548,6 +555,8 @@ package body Huffman is
 			NbCarac : Natural := 0;
 			fichier_decompress : Ada.Streams.Stream_IO.File_Type;
 			stream_decompress : Stream_Access;
+			fichier_apres_decompress : Ada.Streams.Stream_IO.File_Type;
+			stream_apres_decompress : Stream_Access;
 			D: Dico_Caracteres;
 			N: Integer;
 
@@ -561,6 +570,9 @@ package body Huffman is
 			-- Lecture de l'en-tête
 			Open(fichier_decompress, In_File, nom_fichier_compress);
 			stream_decompress := Stream(fichier_decompress);
+			Create(fichier_apres_decompress, Out_File, nom_fichier_apres_decompress);
+			stream_apres_decompress := Stream(fichier_apres_decompress);
+
 			D := Lit_EnTete(stream_decompress);
 
 			-- Récupération de l'arbre de Huffman
@@ -577,8 +589,16 @@ package body Huffman is
 			end if;
 
 
+			-- Récupération de l'arbre de Huffman
+			Initialise_Queue_Arbre(queue_arbre, D);
+			A := Genere_Arbre(queue_arbre);
+			Genere_Code(A, D);
 			H := new Internal_Huffman'(arb => A, dico => D, nb_char => N);
+
+			Decompresse_Corps_Fichier(stream_decompress, stream_apres_decompress, A);
+
 			Close(fichier_decompress);
+			Close(fichier_apres_decompress);
 		end;
 
 		-----------------------------------------------------------------------------
@@ -601,12 +621,9 @@ package body Huffman is
 			end if;
 		end loop;
 
-		declare
-		begin
-			Character'Output(stream_out, FIN_EN_TETE_1);
-			Integer'Output(stream_out, FIN_EN_TETE_2);
-			NbOctets := NbOctets + Character'Size + Integer'Size;
-		end;
+		Character'Output(stream_out, FIN_EN_TETE_1);
+		Integer'Output(stream_out, FIN_EN_TETE_2);
+		NbOctets := NbOctets + Character'Size + Integer'Size;
 
 		return NbOctets;
 	end Ecrit_EnTete;
@@ -616,11 +633,16 @@ package body Huffman is
 	function Ecrit_Texte(H : Arbre_Huffman; in_stream, out_stream : Stream_Access) return Natural is
 		NbOctets: Natural := 0;
 		out_buf : Stream_Buffer.Stream_Buffer := Cree_Stream_Buffer(out_stream);
+		NextC, C : Character;
 	begin
+		NextC := Character'Input(in_stream);
 		--while not End_Of_File(in_stream) loop
 		begin
 			loop
-				Write_Code(out_buf, Get_Code(Character'Input(in_stream), H.dico));
+				C := NextC;
+				NextC := Character'Input(in_stream);
+				Put(C);
+				Write_Code(out_buf, Get_Code(C, H.dico));
 				NbOctets := NbOctets + 1; -- normalement il faudrait faire +1 uniquement quand le stream_buffer écrit dans le fichier
 			end loop;
 		exception
@@ -652,6 +674,8 @@ package body Huffman is
 
 		NbOctets := NbOctets + Ecrit_Texte(H, in_stream, out_stream);
 
+		Put("fin d'écriture");
+
 		return NbOctets;
 	end Ecrit_Huffman;
 
@@ -681,33 +705,33 @@ package body Huffman is
 		in_buf : Stream_Buffer.Stream_Buffer := Cree_Stream_Buffer(in_stream);
 		C : Character;
 	begin
+		Put_Line("Decompresse_Corps_Fichier");
 		--while not End_Of_File(in_stream) loop
 		begin
 			loop
 				C := Read_Char(in_buf, A);
 				Put(c);
-				Character'Output(out_stream, C);
+				Character'Output(out_stream, C); -- pour le débug, à supprimer ensuite
 			end loop;
 		exception
 			when Ada.Text_IO.End_Error =>
 				null; -- On a atteint la fin du stream
 		end;
-
-		Libere(in_buf);
+		Put_Line("Fin Decompresse_Corps_Fichier");
 	end Decompresse_Corps_Fichier;
 
 --------------------------------------------------------------------------------
 
 	-- Lit un arbre stocke dans un flux ouvert en lecture
 	-- Le format de stockage est celui decrit dans le sujet
-	function Lit_Huffman(flux : Stream_Access) return Arbre_Huffman is
+	function Lit_Huffman(in_stream, out_stream : Stream_Access) return Arbre_Huffman is
 		H: Arbre_Huffman;
 		D: Dico_Caracteres;
 		N: Integer;
 		A : Arbre;
 		queue_arbre : File_Prio := Cree_File(256); -- Il faudrait utiliser un attribut tel que dico'last mais je ne sais pas comment l'utiliser
 	begin
-		D:= Lit_EnTete(flux);
+		D:= Lit_EnTete(in_stream);
 
 		-- Récupération de l'arbre de Huffman
 		Initialise_Queue_Arbre(queue_arbre, D);
@@ -715,6 +739,7 @@ package body Huffman is
 		Genere_Code(A, D);
 		H := new Internal_Huffman'(arb => A, dico => D, nb_char => N);
 
+		Decompresse_Corps_Fichier(in_stream, out_stream, A);
 		return H;
 	end Lit_Huffman;
 
