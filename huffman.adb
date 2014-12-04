@@ -680,9 +680,18 @@ package body Huffman is
 	function Lit_Huffman(flux : Stream_Access) return Arbre_Huffman is
 		H: Arbre_Huffman;
 		D: Dico_Caracteres;
+		N: Integer;
+		A : Arbre;
+		queue_arbre : File_Prio := Cree_File(256); -- Il faudrait utiliser un attribut tel que dico'last mais je ne sais pas comment l'utiliser
 	begin
 		D:= Lit_EnTete(flux);
-		-- STUB
+
+		-- Récupération de l'arbre de Huffman
+		Initialise_Queue_Arbre(queue_arbre, D);
+		A := Genere_Arbre(queue_arbre);
+		Genere_Code(A, D);
+		H := new Internal_Huffman'(arb => A, dico => D, nb_char => N);
+
 		return H;
 	end Lit_Huffman;
 
