@@ -24,69 +24,93 @@ package body Huffman is
 	for Octet'Size use 8; -- permet d'utiliser Octet'Input et Octet'Output,
 	                      -- pour lire/ecrire un octet dans un flux
 
+	-- L'arbre de Huffman est stocké sous la forme d'un arbre binaire
 	type Noeud is record
-		Lettre: Character;	-- Only the leaves matter...
+		Lettre: Character;	-- La lettre n'est utile que pour les feuille
 		FilsG: Arbre;
 		FilsD: Arbre;
 	end record;
 
+	-- Les données utile pour l'arbre de huffman
    	type Internal_Huffman is record
    		arb : Arbre;
 		dico : Dico_Caracteres;
    		nb_char : Integer;
    	end record;
 
+	-- Caractères utilisés pour séparer le header du reste du fichier compressé
 	FIN_EN_TETE_1 : constant Character := '-';
 	FIN_EN_TETE_2 : constant Integer := -1;
 
 --------------------------------------------------------------------------------
+-- En rapport avec la structure Arbre
 
+	-- Libere un noeud
 	procedure Libere is new Ada.Unchecked_Deallocation (Noeud, Arbre);
+
+	-- Retourne true si l'arbre A est une feuille
 	function Est_une_Feuille(A : in Arbre) return Boolean;
 
-	-- Lit un arbre stocke dans un flux ouvert en lecture
-	-- Le format de stockage est celui decrit dans le sujet
+	-- Retourne vrai si l'arbre est vide
+	function Est_Vide (A : in Arbre) return Boolean;
+
+--------------------------------------------------------------------------------
+-- En rapport avec l'algorithme de compression/decompression
+
+	-- Lit le flux d'entree in_stream et compte les occurence de chacuns des
+	-- caractères présent dans le in_steam. Le nombre de carctères lu est
+	-- enregistré dans N, et le nombre d'occurences sont enregistrées dans le
+	-- dictionnaire D.
 	procedure Extrait_Dico(in_stream : in Stream_Access; D : out Dico_Caracteres;
 				N : out Integer);
-	function Lit_EnTete(in_stream : in Stream_Access) return Dico_Caracteres;
 
-	procedure Genere_Code(A: in Arbre; D: in out Dico_Caracteres);
-	procedure Decompresse_Corps_Fichier(in_stream, out_stream : in Stream_Access;
-				A : Arbre);
-
-	-- Retourne un dictionnaire contenant les caracteres presents
-	-- dans l'arbre et leur code binaire (evite les parcours multiples)
-	-- de l'arbre
-	--function Genere_Dictionnaire(H : in Arbre_Huffman) return Dico_Caracteres;
-
-
--- -- Parcours a l'aide d'un iterateur sur un code, en partant du noeud A
--- --  * Si un caractere a ete trouve il est retourne dans Caractere et
--- --    Caractere_Trouve vaut True. Le code n'a eventuellement pas ete
--- --    totalement parcouru. A est une feuille.
--- --  * Si l'iteration est terminee (plus de bits a parcourir ds le code)
--- --    mais que le parcours s'est arrete avant une feuille, alors
--- --    Caractere_Trouve vaut False, Caractere est indetermine
--- --    et A est le dernier noeud atteint.
--- 	procedure Get_Caractere(It_Code : in Iterateur_Code; A : in out Arbre;
--- 				Caractere_Trouve : out Boolean;
--- 				Caractere : out Character);
-
-	function Est_Vide (A : in Arbre) return Boolean;
-	function Genere_Arbre(queue_arbre : File_Prio) return Arbre;
+	-- Cree une file de priorité contenant tout les caractères du dictionnaire.
+	-- La prioritée est le nombre d'occurence de ces caractères.
 	procedure Initialise_Queue_Arbre(queue_arbre : in out File_Prio;
 				D : in Dico_Caracteres);
+
+	-- Génère les codes à partir de l'arbre A et les enregistres dans le
+	-- dictionnaire D.
+	procedure Genere_Code(A: in Arbre; D: in out Dico_Caracteres);
+
+	-- Écrit l'en-tête du fichier compressé
 	function Ecrit_EnTete(H : Arbre_Huffman; stream_out : Stream_Access) return Natural;
+
+	-- Lis l'en-tête d'un fichier compressé pour pouvoir généré le dictionnaire
+	-- correspondant.
+	function Lit_EnTete(in_stream : in Stream_Access) return Dico_Caracteres;
+
+	-- Génère l'arbre de Huffman à partir de la file de prioritée queue_arbre.
+	-- Cette file doit contenir tout les caractères avec leur nombre d'occurence.
+	function Genere_Arbre(queue_arbre : File_Prio) return Arbre;
 
     -----------------------------------------------------------------------------
 
+	-- Ce package encapsule les opérations d'écriture et de lecture d'un
+	-- caractère dans un flux compressé. Ce flux peut être un flux de sortie
+	-- pour écrire un fichier compressé, ou un flux de lecture pour le
+	-- décompresser.
+	-- Il est écrit ici, car il a besoin de connaitre la structure interne de
+	-- l'arbre binaire Arbre. Si Arbre avait été un package séparé, il aurait
+	-- été également possible de séparer ce package de Huffman.
 	package Stream_Buffer is
 		type Stream_Buffer is private;
+
 		function Cree_Stream_Buffer(S : Stream_Access) return Stream_Buffer;
-		function Get_Bit(S : Stream_Buffer) return Code.Bit;
+
+		-- Écrit le code Binaire C dans le flux (le Stream_Access encapsulé
+		-- doit-être un flux de sortie
 		procedure Write_Code(S : Stream_Buffer; C : Code_Binaire);
+
+		-- Lit le prochain caractère dans le stream encapsulé. Celui-ci doit
+		-- être un flux d'entrée. Génère l'exception End_Error quand la fin du
+		-- stream est atteinte.
 		function Read_Char(S : Stream_Buffer; A : Arbre) return Character;
+
+		-- Ecrit des bits vide à la fin du stream pour compléter le dernier octet.
 		procedure Write_Last_Byte(S : Stream_Buffer);
+
+		-- Libere la mémoire du Stream_Buffer.
 		procedure Libere(S: in out Stream_Buffer);
 	private
 		type Stream_Buffer_Internal;
@@ -96,6 +120,8 @@ package body Huffman is
     -----------------------------------------------------------------------------
 
 	package body Stream_Buffer is
+
+		-- permet d'accéder à des bits dans un octet de manière indexé.
 		type Bit_Number is range 0 .. 7;
 		type Octet is array (Bit_Number) of Bit;
 		pragma Pack (Octet);
@@ -106,8 +132,9 @@ package body Huffman is
 						Source => Octet,
 						Target => Integer);
 
-		--type Octet is mod 256;
+    -----------------------------------------------------------------------------
 
+		-- Un Stream_Buffer connait en interne l'index du prochain bit à lire ou à écrire, ainsi que le prochain Octet à lire/écrire.
 		type Stream_Buffer_Internal(S: Stream_Access) is record
 			O : Octet;
 			bit_courant : Bit_Number := 0;
@@ -116,6 +143,13 @@ package body Huffman is
 
     -----------------------------------------------------------------------------
 
+		-- Retourne le prochain bit dans le stream (et récupère l'octet suivant si
+		-- necessaire
+		-- Génère l'exception End_Error lorsque la fin du stream est atteinte
+		function Get_Bit(S : Stream_Buffer) return Code.Bit;
+
+    -----------------------------------------------------------------------------
+	
 		procedure Free is new Ada.Unchecked_Deallocation (Stream_Buffer_Internal,
 						Stream_Buffer);
 		procedure Libere(S: in out Stream_Buffer) is
@@ -138,6 +172,7 @@ package body Huffman is
 		function Get_Bit(S : Stream_Buffer) return Code.Bit is
 		begin
 			if S.bit_courant = Bit_Number'Last then
+				-- On a atteint le dernier bit de l'octet courant
 				S.o := Octet'Input(S.stream);
 				S.bit_courant := 0;
 			else
@@ -155,6 +190,8 @@ package body Huffman is
 			while Has_Next(it) loop
 				S.O(S.bit_courant) := Next(it);
 				if S.bit_courant = Bit_Number'Last then
+					-- On a atteind le dernier bitde l'octet courant, il faut donc
+					-- l'écrire.
 					Octet'Output(S.stream, S.O);
 					S.bit_courant := 0;
 				else
@@ -167,6 +204,7 @@ package body Huffman is
 
 		procedure Write_Last_Byte(S : Stream_Buffer) is
 		begin
+			-- On complète les dernier bits par des 0.
 			loop
 				exit when S.bit_courant = Bit_Number'Last;
 				S.O(S.bit_courant) := 0;
@@ -181,6 +219,8 @@ package body Huffman is
 			child : Arbre;
 			bit : Code.Bit;
 		begin
+			-- On parcourt l'arbre en fonction de ce que contient jusqu'à
+			-- trouver un charactère valide
 			bit := Get_Bit(S);
 			if bit = ZERO then
 				child := A.filsG;
@@ -612,6 +652,7 @@ package body Huffman is
 		NbOctets: Natural := 0;
 
 	begin
+		-- On n'écrit les stats uniquements pour les caractères présents dans le fichier
 		for C in Character'Range loop
 			if Est_Present(C, H.dico) then
 				Character'Output(stream_out, C);
@@ -620,6 +661,7 @@ package body Huffman is
 			end if;
 		end loop;
 
+		-- On rajoute des marqueurs de fin pour séparer l'en-tête du reste du fichier
 		Character'Output(stream_out, FIN_EN_TETE_1);
 		Integer'Output(stream_out, FIN_EN_TETE_2);
 		NbOctets := NbOctets + Character'Size + Integer'Size;
@@ -642,7 +684,10 @@ package body Huffman is
 				NextC := Character'Input(in_stream);
 				Put(C);
 				Write_Code(out_buf, Get_Code(C, H.dico));
-				NbOctets := NbOctets + 1; -- normalement il faudrait faire +1 uniquement quand le stream_buffer écrit dans le fichier
+				-- normalement il faudrait faire +1 uniquement quand le
+				-- stream_buffer écrit dans le fichier. Le calcul du nombre
+				-- d'octet en compression n'est donc actuellement pas bon.
+				NbOctets := NbOctets + 1;
 			end loop;
 		exception
 			when Ada.Text_IO.End_Error =>
@@ -761,9 +806,9 @@ package body Huffman is
 --    et A est le dernier noeud atteint.
 	procedure Get_Caractere(It_Code : in Iterateur_Code; A : in out Arbre_Huffman;
 					Caractere_Trouve : out Boolean; Caractere : out Character) is
-
 	begin
-        null;
+		null; -- Il faudrait utiliser la fonction Stream_Buffer.Read_Char dans
+		-- cette fonction end Get_Caractere;
 	end Get_Caractere;
 
 end Huffman;
