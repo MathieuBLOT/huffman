@@ -1,5 +1,8 @@
 with Ada.Streams.Stream_IO; use Ada.Streams.Stream_IO;
 
+with dico;
+use dico;
+
 with code;
 use code;
 -- paquetage representant un arbre de Huffman de caracteres
@@ -35,6 +38,7 @@ package Huffman is
 
 	procedure Huffman_procedure_test;
 
+	function Get_Dictionnaire(H : Arbre_Huffman) return Dico_Caracteres;
 
 	------ Parcours de l'arbre (decodage)
 	-- Parcours a l'aide d'un iterateur sur un code, en partant du noeud A

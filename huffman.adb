@@ -123,7 +123,7 @@ package body Huffman is
 		begin
 			-- On n'extrait pas tout de suite le premier bit. Cela sera fait
 			-- lors du premier appel à Get_Bit
-			return new Stream_Buffer_Internal(S); 
+			return new Stream_Buffer_Internal(S);
 		end Cree_Stream_Buffer;
 
     -----------------------------------------------------------------------------
@@ -335,7 +335,7 @@ package body Huffman is
 				New_Occurrence(D, C);
 				N := N + 1;
 			end loop;
-		exception 
+		exception
 			when Ada.Streams.Stream_IO.End_Error =>
 				null; -- On a atteint la fin du stream
 		end;
@@ -467,14 +467,14 @@ package body Huffman is
 		original_file : Ada.Streams.Stream_IO.File_Type;
 		original_stream : Stream_Access;
 
-		arbre_solution : constant String := 
+		arbre_solution : constant String :=
 			"┬─0─┬─0─                                c:  ( 5 occurrences)" & ASCII.LF &
 			"│   └─1─                                d:  ( 6 occurrences)" & ASCII.LF &
 			"└─1─┬─0─                                e:  ( 7 occurrences)" & ASCII.LF &
 			"│   └─1─┬─0─                            a:  ( 3 occurrences)" & ASCII.LF &
 			"│   │   └─1─                            b:  ( 4 occurrences)" & ASCII.LF ;
 
-		arbre_solution_avec_code : constant String := 
+		arbre_solution_avec_code : constant String :=
 			"┬─0─┬─0─                                c: 00 ( 5 occurrences)" & ASCII.LF &
 			"│   └─1─                                d: 10 ( 6 occurrences)" & ASCII.LF &
 			"└─1─┬─0─                                e: 01 ( 7 occurrences)" & ASCII.LF &
@@ -482,7 +482,7 @@ package body Huffman is
 			"│   │   └─1─                            b: 111 ( 4 occurrences)" & ASCII.LF ;
 
 	begin
-		
+
 		-- Compression
 		declare
 			NbCarac : Natural := 0;
@@ -530,11 +530,11 @@ package body Huffman is
 			end if;
 
 			H := new Internal_Huffman'(arb => A, dico => D, nb_char => N);
-			
+
 			Create(fichier_compress, Out_File, nom_fichier_compress);
 			stream_compress := Stream(fichier_compress);
 			NbCarac := Ecrit_Huffman(H, original_stream, stream_compress);
-			
+
 			Put_Line ("Taille avant compression : " & Integer'Image(N) & " et " &
 					  "taille après compression : " & Integer'Image(NbCarac));
 			Close(original_file);
@@ -695,6 +695,11 @@ package body Huffman is
 		return H;
 	end Lit_Huffman;
 
+--------------------------------------------------------------------------------
+	function Get_Dictionnaire(H : Arbre_Huffman) return Dico_Caracteres is
+	begin
+		return H.dico;
+	end Get_Dictionnaire;
 --------------------------------------------------------------------------------
 
 ------ Parcours de l'arbre (decodage)

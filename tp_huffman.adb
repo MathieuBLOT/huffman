@@ -42,7 +42,7 @@ procedure tp_huffman is
 		S_Out := Stream(Fichier_Out);
 
 		H := Cree_Huffman(Nom_Fichier_In);
--- 		D = Genere_Dictionnaire(H);
+		D := Get_Dictionnaire(H);
 
 		Nb_Octets_Ecrits := Ecrit_Huffman(H, S_In, S_Out);
 
@@ -87,7 +87,7 @@ procedure tp_huffman is
 
 	procedure Decompresse(Nom_Fichier_In, Nom_Fichier_Out : in String) is
 		H : Arbre_Huffman;
-		Tree : Arbre;
+-- 		Tree : Arbre;
 		Caractere_Trouve : Boolean := false;
 		Caractere : Character;
 
@@ -98,9 +98,9 @@ procedure tp_huffman is
 
 		O : Octet;
 		Code_Tmp : Code_Buffer;
-		Bit_Tmp : Bit;
+-- 		Bit_Tmp : Bit;
 		Code_Seq : Code_Binaire := Cree_Code;
-		It : Iterateur_Code := Cree_Iterateur(Code_Seq);
+		It : Iterateur_Code := Cree_Iterateur(Code_Seq);	-- IS supposed to be modified by Get_Caractere
 	begin
 		Create(Fichier_In, In_File, Nom_Fichier_In);
 		S_In := Stream(Fichier_In);
