@@ -1,0 +1,80 @@
+		Introduction
+
+Le but de ce TP est de réaliser un programme en Ada de compression-décompression  à  l'aide  de  l'algorithme  du  codage  de Huffman.
+Dans cette optique, il nous a été suggéré d'utiliser 4 modules : code.ads, dico.ads, file_priorite.ads et huffman.ads ; ceux-ci contenant des suggestions de fonctions et procédures à employer pour la réalisation de ce projet. Toutefois, d'autres ont été rajoutées par souci de clarté ou de factorisation.
+
+		I/ Réalisation des structures de donées du projet
+
+*code.ads :
+	Code_Binaire et Iterateur_Code sont des pointeurs sur leurs homologues homonymes internes :
+		-> Code_Binaire_Interne est une liste chaînée de Bits : cette implémentation a été retenue car la longueur d'un code est inconnu avant sa détermination.
+		-> Iterateur_Code_Interne est un pointeur sur un élément de cette liste (initialement le premier).
+
+*dico.ads :
+	Dico_Caracteres est un pointeur sur Dico_Caracteres_Interne.
+	Dico_Caracteres_Interne est un enregistrement contenant :
+		-> Le nombre de différents caractères dans le dictionnaire.
+		-> Le nombre de caractères total dans le dictionnaire (total des occurrences).
+		-> Un tableau ayant des caractères pour indices et des Info_Caractere pour valeurs.
+	Info_Caractere est un enregistrement contenant :
+		-> Le code associé au caractère (indice du tableau).
+		-> Le nombre d'occurrences du caractère.
+
+*file_priorite.ads :
+	File_Prio est un pointeur sur File_Interne.
+	File_Interne est un enregistrement contenant :
+		-> Le nombre d'éléments dans la  file.
+		-> Un tableau d'Element_Tas.
+	Element_Tas est un enregistrement contenant :
+		-> Une Donnee (type générique).
+		-> Une Priorite (type générique).
+
+La file de priorité est ainsi implémentée comme un tas constituée d'un tableau et d'un nombre d'éléments.
+
+*huffman.ads :
+	Arbre_Huffman est un pointeur sur Internal_Huffman.
+	Internal_Huffman est un enregistrement contenant :
+		-> L'Arbre de Huffman à proprement parler.
+		-> Le dictionnaire lié à l'arbre.
+		-> Le nombre de caractères dans l'arbre et le dictionnaire. <=  /!\ REDONDANCE /!\
+	Arbre est un pointeur sur un Noeud.
+	Un Noeud est un enregistrement contenant :
+		-> Un caractère.
+		-> Deux fils, qui sont des Arbres.
+
+	Ce module emploie le package file_priorite, en employant les types Arbres et Integer en lieu et place de Donnee et Priorite, ainsi que la fonction "<" pour déteriner la priorité d'un élémet par rapport à un autre.
+	La  majorité des fonctions et procédures ajoutées en plus de celles suggérées sont dans ce package : ainsi, il y a une fonction affichant graphiquement l'arbre, par exemple.
+
+		II/ Couts des algorithmes principaux
+
+*code.ads :
+	Etant implémentée sous forme simplement chaînée, les procédures Ajoute_Apres sont en O(n).
+	(La  fonction  Longueur également.)
+	Tous les autres algorithmes du package sont en O(1).
+
+*dico.ads :
+	La structure principale du dictionnaire étant un tableau dont on accède directement depuis un caractère, la majorité des algorithmes sont en O(1).
+	Seules la procédure Affiche est en O(n), étant donné que l'on parcourt le tableau intégralement.
+
+*file_priorite.ads :
+	La file de priorité est implémentée comme un tableau : les opérations principales (Insere et  Supprime) sont en log2(n).
+	La fonction vérifiant si un élément appartient à la file est en O(n), et tous les autres algorithmes sont en O(1).
+
+*huffman.ads :
+	// J'ignore  quelle  est  la complexité  de affiche  - linéaire je  crois, mais je  n'en suis pas  sûr...
+	21:43 -  Grenoble : WTF.
+
+		III/  Résultats obtenus
+
+Le  développement de ce  projet s'est effectué de manière parllèle : nous avons ainsi codé et testé les packages séparément afin de s'assurer de leur rigidité.
+L'affichage graphique des arbres de Huffman s'est avérée extrêmement pratique pour débugger.
+
+Ainsi, les fichiers test_code.adb, test_file_priorite.adb et test_huffman vérifient les packages qui leur sont associés.
+Un petit arbre de Huffman est généré grâce au fichier Tests/3a_4b_5c_6d_7e.txt.
+
+Nous avons ainsi vérifié que les packages se comportent comme attendus.
+
+		Conclusion
+
+Au cours de ce projet, nous avons manipulé simulatanément les principales structures de données rencontrées en programmation ; chaque structure est plus ou moins indiquée suivant la situation, il n'y a pas de structure meilleure dans tous les cas.
+A partir d'un moment, il a été prévu, si on avait eu le temps, de créer des modules génériques de liste, de tas et d'arbre génériques à utiliser respectivement pour les modules code.ads, file_priorite.ads et huffman.ads.
